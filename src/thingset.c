@@ -36,7 +36,7 @@ static struct thingset_data_object metadata_object =
     THINGSET_GROUP(0, THINGSET_ID_METADATA, "_Metadata", NULL);
 #endif
 
-static char *type_name_lookup[THINGSET_TYPE_FN_I32 + 1] = {
+static char const* const type_name_lookup[THINGSET_TYPE_FN_I32 + 1] = {
     "bool",   "u8",    "i8",     "u16",     "i16",      "u32",    "i32",
     "u64",    "i64",   "f32",    "decimal", "string",   "buffer", "array",
     "record", "group", "subset", "()->()",  "()->(i32)"
@@ -766,7 +766,7 @@ int thingset_get_path(struct thingset_context *ts, char *buf, size_t size,
     }
 }
 
-static inline char *type_to_type_name(const enum thingset_type type)
+static inline char const* type_to_type_name(const enum thingset_type type)
 {
     return type_name_lookup[type];
 }
@@ -784,7 +784,7 @@ static int get_function_arg_types(struct thingset_context *ts, uint16_t parent_i
                 }
                 len += snprintf(buf, size, ",");
             }
-            char *elementType = type_to_type_name(ts->data_objects[i].type);
+            char const* elementType = type_to_type_name(ts->data_objects[i].type);
             len += snprintf(buf + len, size - len, "%s", elementType);
             buf += len;
             size -= len;
@@ -802,7 +802,7 @@ int thingset_get_type_name(struct thingset_context *ts, const struct thingset_da
 {
     switch (obj->type) {
         case THINGSET_TYPE_ARRAY: {
-            char *elementType = type_to_type_name(obj->data.array->element_type);
+            char const* elementType = type_to_type_name(obj->data.array->element_type);
             if (sizeof(elementType) > size) {
                 return -THINGSET_ERR_RESPONSE_TOO_LARGE;
             }
@@ -832,7 +832,7 @@ int thingset_get_type_name(struct thingset_context *ts, const struct thingset_da
             }
             return len;
         default: {
-            char *type = type_to_type_name(obj->type);
+            char const* type = type_to_type_name(obj->type);
             return snprintf(buf, size, "%s", type);
         }
     }
