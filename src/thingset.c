@@ -554,7 +554,7 @@ void thingset_set_authentication(struct thingset_context *ts, uint8_t flags)
 void thingset_set_update_callback(struct thingset_context *ts, const uint16_t subsets,
                                   void (*update_cb)(void))
 {
-    ts->update_subsets = subsets;
+    ts->update_subsets = (uint8_t)subsets;
     ts->update_cb = update_cb;
 }
 
@@ -758,7 +758,7 @@ int thingset_get_path(struct thingset_context *ts, char *buf, size_t size,
 
     pos += snprintf(buf + pos, size - pos, "%s", obj->name);
 
-    if (pos < size) {
+    if (pos < (int)size) {
         return pos;
     }
     else {
@@ -789,7 +789,7 @@ static int get_function_arg_types(struct thingset_context *ts, uint16_t parent_i
             buf += len;
             size -= len;
             total_len += len;
-            if (total_len > size) {
+            if (total_len > (int)size) {
                 return -THINGSET_ERR_RESPONSE_TOO_LARGE;
             }
         }

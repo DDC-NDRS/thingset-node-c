@@ -231,7 +231,7 @@ static int json_serialize_simple_value(char *buf, size_t size, union thingset_da
             return -THINGSET_ERR_UNSUPPORTED_FORMAT;
     }
 
-    if (pos >= 0 && pos < size) {
+    if (pos >= 0 && pos < (int)size) {
         return pos;
     }
     else {
@@ -331,7 +331,7 @@ static int txt_serialize_value(struct thingset_context *ts,
         }
     }
 
-    if (pos >= 0 && pos < size) {
+    if (pos >= 0 && pos < (int)size) {
         ts->rsp_pos += pos;
         return 0;
     }
@@ -353,7 +353,7 @@ static int txt_serialize_string(struct thingset_context *ts, const char *buf, bo
 {
     int len = snprintf(ts->rsp + ts->rsp_pos, ts->rsp_size - ts->rsp_pos, "\"%s\"%s", buf,
                        is_key ? ":" : ",");
-    if (len >= 0 && len < ts->rsp_size - ts->rsp_pos) {
+    if (len >= 0 && len < (int)(ts->rsp_size - ts->rsp_pos)) {
         ts->rsp_pos += len;
         return 0;
     }
@@ -513,7 +513,7 @@ static int txt_deserialize_simple_value(struct thingset_context *ts,
     errno = 0;
     switch (type) {
         case THINGSET_TYPE_F32:
-            *data.f32 = strtod(buf, NULL);
+            *data.f32 = (float)strtod(buf, NULL);
             break;
 #if CONFIG_THINGSET_DECFRAC_TYPE_SUPPORT
         case THINGSET_TYPE_DECFRAC: {
@@ -545,16 +545,16 @@ static int txt_deserialize_simple_value(struct thingset_context *ts,
             *data.i32 = strtol(buf, NULL, 0);
             break;
         case THINGSET_TYPE_U16:
-            *data.u16 = strtoul(buf, NULL, 0);
+            *data.u16 = (uint16_t)strtoul(buf, NULL, 0);
             break;
         case THINGSET_TYPE_I16:
-            *data.i16 = strtol(buf, NULL, 0);
+            *data.i16 = (int16_t)strtol(buf, NULL, 0);
             break;
         case THINGSET_TYPE_U8:
-            *data.u8 = strtoul(buf, NULL, 0);
+            *data.u8 = (uint8_t)strtoul(buf, NULL, 0);
             break;
         case THINGSET_TYPE_I8:
-            *data.i8 = strtol(buf, NULL, 0);
+            *data.i8 = (int8_t)strtol(buf, NULL, 0);
             break;
         case THINGSET_TYPE_BOOL:
             if (buf[0] == 't' || buf[0] == '1') {

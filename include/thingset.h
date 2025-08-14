@@ -650,8 +650,9 @@ extern "C" {
 #endif
 
 #define _THINGSET_ADD_ITERABLE_SECTION(type, parent_id, id, ...) \
-    MAYBE_CONST STRUCT_SECTION_ITERABLE(thingset_data_object, _CONCAT(obj_, id)) = \
-        _CONCAT(THINGSET_, type)(parent_id, id, __VA_ARGS__)
+    MSC_DECLARE_SECTION("._thingset_data_object.static") \
+    MAYBE_CONST STRUCT_SECTION_ITERABLE(thingset_data_object, Z_CONCAT(obj_, id)) = \
+        Z_CONCAT(THINGSET_, type)(parent_id, id, __VA_ARGS__)
 
 /** @endcond */
 
@@ -1329,7 +1330,7 @@ extern "C" {
 
 #define THINGSET_USR_W THINGSET_WRITE(THINGSET_ROLE_USR) /**< Write-only access for normal user */
 #define THINGSET_EXP_W THINGSET_WRITE(THINGSET_ROLE_EXP) /**< Write-only access for expert user */
-#define THINGSET_MFR_W THINGSET_WRITE(THINGSET_ROLE_MFR) /**< Write-only access for manuf. */
+#define THINGSET_MFR_W THINGSET_WRITE(THINGSET_ROLE_MFR) /**< Write-only access for manufacturer */
 #define THINGSET_ANY_W THINGSET_WRITE(THINGSET_ROLE_ANY) /**< Write-only access for any user */
 
 #define THINGSET_USR_RW \

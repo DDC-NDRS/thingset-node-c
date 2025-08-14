@@ -68,7 +68,7 @@ int bin_serialize_response(struct thingset_context *ts, uint8_t code, const char
             int ret = vsnprintf((char *)msg_buf_start, msg_buf_size, msg, vargs);
             va_end(vargs);
 
-            if (ret >= 0 && ret < msg_buf_size) {
+            if ((ret >= 0) && (ret < (int)msg_buf_size)) {
                 zcbor_tstr_encode_ptr(ts->encoder, msg_buf_start, ret);
             }
         }
@@ -388,7 +388,7 @@ int thingset_bin_export_subsets_progressively(struct thingset_context *ts, uint1
 {
     if (*index == 0) {
         size_t num_elements = 0;
-        for (int i = 0; i < ts->num_objects; i++) {
+        for (size_t i = 0; i < ts->num_objects; i++) {
             if (ts->data_objects[i].subsets & subsets) {
                 num_elements++;
             }
@@ -591,7 +591,7 @@ static int bin_deserialize_simple_value(struct thingset_context *ts,
                 /* try integer type */
                 int32_t tmp;
                 if (zcbor_int32_decode(ts->decoder, &tmp) == true) {
-                    *data.f32 = tmp;
+                    *data.f32 = (float)tmp;
                     success = true;
                 }
             }
@@ -652,7 +652,7 @@ static int bin_deserialize_simple_value(struct thingset_context *ts,
         case THINGSET_TYPE_STRING: {
             struct zcbor_string str;
             success = zcbor_tstr_decode(ts->decoder, &str);
-            if (success && str.len < detail) {
+            if (success && ((int)str.len < detail)) {
                 if (!check_only) {
                     strncpy(data.str, str.value, str.len);
                     data.str[str.len] = '\0';
