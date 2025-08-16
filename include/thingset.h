@@ -322,7 +322,7 @@ extern "C" {
  */
 #define THINGSET_FN_VOID(parent_id, id, name, void_fn_ptr, access) \
     { \
-        parent_id, id, name, { .void_fn = void_fn_ptr }, THINGSET_TYPE_FN_VOID, 0, access, 0 \
+        parent_id, id, name, { .void_fn = (void (*)(void))void_fn_ptr }, THINGSET_TYPE_FN_VOID, 0, access, 0 \
     }
 
 /**
@@ -340,7 +340,7 @@ extern "C" {
  */
 #define THINGSET_FN_INT32(parent_id, id, name, int32_fn_ptr, access) \
     { \
-        parent_id, id, name, { .i32_fn = int32_fn_ptr }, THINGSET_TYPE_FN_I32, 0, access, 0 \
+        parent_id, id, name, { .i32_fn = (int32_t (*)(void))int32_fn_ptr }, THINGSET_TYPE_FN_I32, 0, access, 0 \
     }
 
 /**
@@ -1490,8 +1490,8 @@ struct thingset_records
 /**
  * ThingSet data object struct.
  */
-struct thingset_data_object
-{
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS No use of bit-field declaration */
+struct thingset_data_object {
     /**
      * ID of parent object
      */
@@ -1545,13 +1545,76 @@ struct thingset_data_object
      */
     MAYBE_CONST uint32_t subsets : 7;
 
-#ifdef CONFIG_THINGSET_OBJECT_LOOKUP_MAP
+    #ifdef CONFIG_THINGSET_OBJECT_LOOKUP_MAP
     /**
      * Pointer to next node in list for map lookup
      */
     sys_snode_t node;
-#endif /* CONFIG_THINGSET_OBJECT_LOOKUP_MAP */
+    #endif /* CONFIG_THINGSET_OBJECT_LOOKUP_MAP */
 };
+#else
+struct thingset_data_object {
+    /**
+     * ID of parent object
+     */
+    const thingset_object_id_t parent_id;
+
+    /**
+     * Data object ID
+     */
+    const thingset_object_id_t id;
+
+    /**
+     * Data object name
+     */
+    const char *name;
+
+    /**
+     * Pointer to the variable containing the data. The variable type must match the type as
+     * specified.
+     *
+     * For record items, the offset of this item inside the struct is stored (in bytes).
+     */
+    const union thingset_data_pointer data;
+
+    /**
+     * One of THINGSET_TYPE_INT32, _FLOAT, ...
+     */
+    const enum thingset_type type;
+
+    /**
+     * Variable storing different detail information depending on the data type
+     *
+     * - FLOAT32: Decimal digits (precision) to use during serialization to JSON.
+     *
+     * - DECFRAC: Exponent for conversion between internal unit and unit exposed via ThingSet
+     *   (equivalent to decimal digits for FLOAT32).
+     *   Formula: internal value = 10^exponent * ThingSet value
+     *   Example: If a voltage measurement is internally stored as an integer in mV, use exponent 3
+     *   to convert to the SI base unit V as exposed via ThingSet.
+     *
+     * - STRING: Size of the internal buffer in bytes.
+     */
+    const int32_t detail;
+
+    /**
+     * Flags to define read/write access
+     */
+    const uint32_t access;
+
+    /**
+     * Flags to assign data item to different data item subsets (e.g. for reports)
+     */
+    MAYBE_CONST uint32_t subsets;
+
+    #ifdef CONFIG_THINGSET_OBJECT_LOOKUP_MAP
+    /**
+     * Pointer to next node in list for map lookup
+     */
+    sys_snode_t node;
+    #endif /* CONFIG_THINGSET_OBJECT_LOOKUP_MAP */
+};
+#endif
 
 /**
  * Data to describe the endpoint parsed from a ThingSet request
@@ -1638,7 +1701,7 @@ struct thingset_context
     /**
      * Function pointers to mode-specific implementation (text or binary)
      */
-    struct thingset_api *api;
+    struct thingset_api const* api;
 
     /**
      * State information for data processing, either for text mode or binary mode depending on the
@@ -1892,8 +1955,8 @@ int thingset_import_data_progressively_end(struct thingset_context *ts);
  *
  * @returns 0 for success or negative ThingSet response code in case of error
  */
-int thingset_import_record(struct thingset_context *ts, const uint8_t *data, size_t len,
-                           struct thingset_endpoint *endpoint, enum thingset_data_format format);
+int thingset_import_record(struct thingset_context *ts, uint8_t const *data, size_t len,
+                           struct thingset_endpoint const* endpoint, enum thingset_data_format format);
 
 /**
  * Generate a report for a given path.
