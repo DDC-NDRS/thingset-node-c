@@ -16,14 +16,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-int thingset_common_serialize_group(struct thingset_context *ts,
-                                    const struct thingset_data_object *object)
-{
+int thingset_common_serialize_group(struct thingset_context* ts,
+                                    const struct thingset_data_object* object) {
     int err;
 
     err = ts->api->serialize_map_start(ts);
     if (err != 0) {
-        return err;
+        return (err);
     }
 
     if (object->data.group_callback != NULL) {
@@ -31,12 +30,11 @@ int thingset_common_serialize_group(struct thingset_context *ts,
     }
 
     for (unsigned int i = 0; i < ts->num_objects; i++) {
-        if (ts->data_objects[i].parent_id == object->id
-            && (ts->data_objects[i].access & THINGSET_READ_MASK))
-        {
+        if ((ts->data_objects[i].parent_id == object->id) &&
+            (ts->data_objects[i].access & THINGSET_READ_MASK)) {
             err = ts->api->serialize_key_value(ts, &ts->data_objects[i]);
             if (err != 0) {
-                return err;
+                return (err);
             }
         }
     }
@@ -45,37 +43,36 @@ int thingset_common_serialize_group(struct thingset_context *ts,
         object->data.group_callback(THINGSET_CALLBACK_POST_READ);
     }
 
-    return ts->api->serialize_map_end(ts);
+    return (ts->api->serialize_map_end(ts));
 }
 
-int thingset_common_prepare_record_element(struct thingset_context *ts,
-                                           const struct thingset_data_object *item,
-                                           uint8_t *record_ptr,
-                                           thingset_common_record_element_action callback)
-{
+int thingset_common_prepare_record_element(struct thingset_context* ts,
+                                           const struct thingset_data_object* item,
+                                           uint8_t* record_ptr,
+                                           thingset_common_record_element_action callback) {
     int err = -EINVAL;
 
-    switch (item->type)
-    {
-        case THINGSET_TYPE_ARRAY:
-            struct thingset_array *arr = item->data.array;
+    switch (item->type) {
+        case THINGSET_TYPE_ARRAY :
+            struct thingset_array const* arr = item->data.array;
             struct thingset_array arr_offset = {
-                { .u8 = record_ptr + arr->elements.offset },
+                {.u8 = record_ptr + arr->elements.offset},
                 arr->element_type,
                 arr->decimals,
                 arr->max_elements,
                 arr->num_elements,
             };
+
             struct thingset_data_object array_item_offset = {
-                item->parent_id,          item->id,   item->name,
-                { .array = &arr_offset }, item->type, item->detail,
+                item->parent_id, item->id, item->name,
+                {.array = &arr_offset}, item->type, item->detail,
             };
+
             err = callback(ts, &array_item_offset);
             break;
 
-
-        case THINGSET_TYPE_RECORDS:
-            struct thingset_records *rec = item->data.records;
+        case THINGSET_TYPE_RECORDS :
+            struct thingset_records* rec = item->data.records;
             struct thingset_records rec_offset = {
                 record_ptr + (size_t)rec->records,
                 rec->record_size,
@@ -83,55 +80,55 @@ int thingset_common_prepare_record_element(struct thingset_context *ts,
                 rec->num_records,
                 rec->callback,
             };
+
             struct thingset_data_object record_item_offset = {
-                item->parent_id, item->id,     item->name, { .records = &rec_offset },
-                item->type,      item->detail,
+                item->parent_id, item->id, item->name, {.records = &rec_offset},
+                item->type, item->detail,
             };
+
             err = callback(ts, &record_item_offset);
             break;
 
-
-        default:
+        default :
             struct thingset_data_object default_item_offset = {
-                item->parent_id, item->id,     item->name, { .u8 = record_ptr + item->data.offset },
-                item->type,      item->detail,
+                item->parent_id, item->id, item->name, {.u8 = record_ptr + item->data.offset},
+                item->type, item->detail,
             };
+
             err = callback(ts, &default_item_offset);
             break;
-
     }
 
-    return err;
+    return (err);
 }
 
-int thingset_common_serialize_record(struct thingset_context *ts,
-                                     const struct thingset_data_object *object, int record_index)
-{
-    struct thingset_records *records = object->data.records;
+int thingset_common_serialize_record(struct thingset_context* ts,
+                                     const struct thingset_data_object* object, int record_index) {
+    struct thingset_records const* records = object->data.records;
     size_t record_offset;
     int err;
 
     if (record_index >= records->num_records) {
-        return -THINGSET_ERR_NOT_FOUND;
+        return (-THINGSET_ERR_NOT_FOUND);
     }
 
     err = ts->api->serialize_map_start(ts);
     if (err != 0) {
-        return err;
+        return (err);
     }
 
     if (object->detail == THINGSET_DETAIL_DYN_RECORDS) {
         record_offset = 0;
     }
     else {
-        record_offset = record_index * records->record_size;
+        record_offset = (record_index * records->record_size);
     }
 
     if (records->callback != NULL) {
         records->callback(THINGSET_CALLBACK_PRE_READ, record_index);
     }
 
-    const struct thingset_data_object *item = thingset_get_object_by_id(ts, object->id) + 1;
+    const struct thingset_data_object* item = thingset_get_object_by_id(ts, object->id) + 1;
     while (item < &ts->data_objects[ts->num_objects]) {
         if (item->parent_id != object->id) {
             item++;
@@ -139,12 +136,12 @@ int thingset_common_serialize_record(struct thingset_context *ts,
         }
 
         /* create new object with data pointer including offset */
-        uint8_t *record_ptr = (uint8_t *)records->records + record_offset;
+        uint8_t* record_ptr = (uint8_t*)records->records + record_offset;
         err = thingset_common_prepare_record_element(ts, item, record_ptr,
                                                      ts->api->serialize_key_value);
 
         if (err != 0) {
-            return err;
+            return (err);
         }
 
         item++;
@@ -154,57 +151,57 @@ int thingset_common_serialize_record(struct thingset_context *ts,
         records->callback(THINGSET_CALLBACK_POST_READ, record_index);
     }
 
-    return ts->api->serialize_map_end(ts);
+    return (ts->api->serialize_map_end(ts));
 }
 
-int thingset_common_get(struct thingset_context *ts)
-{
-    struct thingset_data_object *parent;
+int thingset_common_get(struct thingset_context* ts) {
+    struct thingset_data_object const* parent;
     int err;
 
     ts->api->serialize_response(ts, THINGSET_STATUS_CONTENT, NULL);
 
     switch (ts->endpoint.object->type) {
-        case THINGSET_TYPE_GROUP:
+        case THINGSET_TYPE_GROUP :
             err = thingset_common_serialize_group(ts, ts->endpoint.object);
             break;
-        case THINGSET_TYPE_FN_VOID:
-        case THINGSET_TYPE_FN_I32:
+
+        case THINGSET_TYPE_FN_VOID :
+        case THINGSET_TYPE_FN_I32 :
             /* bad request, as we can't read exec object's values */
             err = -THINGSET_ERR_BAD_REQUEST;
             break;
-        case THINGSET_TYPE_RECORDS:
+
+        case THINGSET_TYPE_RECORDS :
             if (ts->endpoint.index != THINGSET_ENDPOINT_INDEX_NONE) {
                 err = thingset_common_serialize_record(ts, ts->endpoint.object, ts->endpoint.index);
                 break;
             }
             err = ts->api->serialize_value(ts, ts->endpoint.object);
             break;
-        default:
-            parent = thingset_get_object_by_id(ts, ts->endpoint.object->parent_id);
 
-            if (parent != NULL && parent->data.group_callback != NULL) {
+        default :
+            parent = thingset_get_object_by_id(ts, ts->endpoint.object->parent_id);
+            if ((parent != NULL) && (parent->data.group_callback != NULL)) {
                 parent->data.group_callback(THINGSET_CALLBACK_PRE_READ);
             }
 
             err = ts->api->serialize_value(ts, ts->endpoint.object);
 
-            if (parent != NULL && parent->data.group_callback != NULL) {
+            if ((parent != NULL) && (parent->data.group_callback != NULL)) {
                 parent->data.group_callback(THINGSET_CALLBACK_POST_READ);
             }
             break;
     }
 
     if (err == 0) {
-        return ts->rsp_pos;
+        return (ts->rsp_pos);
     }
     else {
-        return ts->api->serialize_response(ts, -err, NULL);
+        return (ts->api->serialize_response(ts, (uint8_t)-err, NULL));
     }
 }
 
-int thingset_common_fetch(struct thingset_context *ts)
-{
+int thingset_common_fetch(struct thingset_context* ts) {
     int err;
 
     /* initialize response with success message */
@@ -215,20 +212,19 @@ int thingset_common_fetch(struct thingset_context *ts)
     if (ts->api->deserialize_null(ts) == 0) {
         /* fetch names */
         for (unsigned int i = 0; i < ts->num_objects; i++) {
-            if ((ts->data_objects[i].access & THINGSET_READ_MASK)
-                && (ts->data_objects[i].parent_id == ts->endpoint.object->id))
-            {
+            if ((ts->data_objects[i].access & THINGSET_READ_MASK) &&
+                (ts->data_objects[i].parent_id == ts->endpoint.object->id)) {
                 err = ts->api->serialize_key(ts, &ts->data_objects[i]);
                 if (err != 0) {
-                    return ts->api->serialize_response(ts, -err, NULL);
+                    return (ts->api->serialize_response(ts, (uint8_t)-err, NULL));
                 }
             }
         }
     }
     else if (ts->api->deserialize_list_start(ts) == 0) {
         if (ts->endpoint.object->type != THINGSET_TYPE_GROUP) {
-            return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "%s is not a group",
-                                               ts->endpoint.object->name);
+            return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "%s is not a group",
+                                               ts->endpoint.object->name));
         }
 
         /* fetch values */
@@ -236,47 +232,46 @@ int thingset_common_fetch(struct thingset_context *ts)
             ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_PRE_READ);
         }
 
-        const struct thingset_data_object *object;
+        struct thingset_data_object const* object;
         while ((err = ts->api->deserialize_child(ts, &object))
-               != -THINGSET_ERR_DESERIALIZATION_FINISHED)
-        {
+                != -THINGSET_ERR_DESERIALIZATION_FINISHED) {
             if (err != 0) {
-                return ts->api->serialize_response(ts, -err, NULL);
+                return (ts->api->serialize_response(ts, (uint8_t)-err, NULL));
             }
 
-            if (object->type == THINGSET_TYPE_GROUP && ts->endpoint.object->id != THINGSET_ID_PATHS
-                && ts->endpoint.object->id != THINGSET_ID_METADATA)
-            {
-                return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "%s is a group",
-                                                   object->name);
+            if ((object->type == THINGSET_TYPE_GROUP) && (ts->endpoint.object->id != THINGSET_ID_PATHS) &&
+                (ts->endpoint.object->id != THINGSET_ID_METADATA)) {
+                return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "%s is a group",
+                                                    object->name));
             }
 
             if ((object->access & THINGSET_READ_MASK & ts->auth_flags) == 0) {
                 if (object->access & THINGSET_READ_MASK) {
-                    return ts->api->serialize_response(ts, THINGSET_ERR_UNAUTHORIZED,
-                                                       "Authentication required for %s",
-                                                       object->name);
+                    return (ts->api->serialize_response(ts, THINGSET_ERR_UNAUTHORIZED,
+                                                        "Authentication required for %s",
+                                                        object->name));
                 }
                 else {
-                    return ts->api->serialize_response(ts, THINGSET_ERR_FORBIDDEN,
-                                                       "Reading %s forbidden", object->name);
+                    return (ts->api->serialize_response(ts, THINGSET_ERR_FORBIDDEN,
+                                                        "Reading %s forbidden",
+                                                        object->name));
                 }
             }
 
             if (ts->endpoint.object->id == THINGSET_ID_PATHS) {
                 err = ts->api->serialize_path(ts, object);
             }
-#ifdef CONFIG_THINGSET_METADATA_ENDPOINT
+            #ifdef CONFIG_THINGSET_METADATA_ENDPOINT
             else if (ts->endpoint.object->id == THINGSET_ID_METADATA) {
                 err = ts->api->serialize_metadata(ts, object);
             }
-#endif
+            #endif
             else {
                 err = ts->api->serialize_value(ts, object);
             }
 
             if (err != 0) {
-                return ts->api->serialize_response(ts, -err, NULL);
+                return (ts->api->serialize_response(ts, (uint8_t)-err, NULL));
             }
         }
 
@@ -285,41 +280,39 @@ int thingset_common_fetch(struct thingset_context *ts)
         }
     }
     else {
-        return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Invalid payload");
+        return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Invalid payload"));
     }
 
     ts->api->serialize_list_end(ts);
 
-    return 0;
+    return (0);
 }
 
-int thingset_common_update(struct thingset_context *ts)
-{
-    const struct thingset_data_object *object;
+int thingset_common_update(struct thingset_context* ts) {
+    const struct thingset_data_object* object;
     bool updated = false;
     int err;
 
     err = ts->api->deserialize_map_start(ts);
     if (err != 0) {
-        return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Map with data required");
+        return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Map with data required"));
     }
 
     /* loop through all elements to check if request is valid */
     while ((err = ts->api->deserialize_child(ts, &object))
-           != -THINGSET_ERR_DESERIALIZATION_FINISHED)
-    {
+            != -THINGSET_ERR_DESERIALIZATION_FINISHED) {
         if (err != 0) {
-            return ts->api->serialize_response(ts, -err, NULL);
+            return (ts->api->serialize_response(ts, -err, NULL));
         }
 
         if ((object->access & THINGSET_WRITE_MASK & ts->auth_flags) == 0) {
             if (object->access & THINGSET_WRITE_MASK) {
-                return ts->api->serialize_response(ts, THINGSET_ERR_UNAUTHORIZED,
-                                                   "Authentication required for %s", object->name);
+                return (ts->api->serialize_response(ts, THINGSET_ERR_UNAUTHORIZED,
+                                                    "Authentication required for %s", object->name));
             }
             else {
-                return ts->api->serialize_response(ts, THINGSET_ERR_FORBIDDEN,
-                                                   "Item %s is read-only", object->name);
+                return (ts->api->serialize_response(ts, THINGSET_ERR_FORBIDDEN,
+                                                    "Item %s is read-only", object->name));
             }
         }
 
@@ -329,16 +322,16 @@ int thingset_common_update(struct thingset_context *ts)
          * checked.
          */
         uint8_t dummy_data[8];
-        uint8_t *data = object->type == THINGSET_TYPE_BYTES || object->type == THINGSET_TYPE_ARRAY
-                            ? object->data.u8
-                            : dummy_data;
+        uint8_t* data = ((object->type == THINGSET_TYPE_BYTES) || (object->type == THINGSET_TYPE_ARRAY))
+                        ? object->data.u8
+                        : dummy_data;
         struct thingset_data_object dummy_object = {
-            0, 0, "Dummy", { .u8 = data }, object->type, object->detail
+            0, 0, "Dummy", {.u8 = data}, object->type, object->detail
         };
 
         err = ts->api->deserialize_value(ts, &dummy_object, true);
         if (err != 0) {
-            return ts->api->serialize_response(ts, -err, NULL);
+            return (ts->api->serialize_response(ts, -err, NULL));
         }
     }
 
@@ -351,11 +344,10 @@ int thingset_common_update(struct thingset_context *ts)
 
     /* actually write data */
     while ((err = ts->api->deserialize_child(ts, &object))
-           != -THINGSET_ERR_DESERIALIZATION_FINISHED)
-    {
+           != -THINGSET_ERR_DESERIALIZATION_FINISHED) {
         err = ts->api->deserialize_value(ts, object, false);
         if (err != 0) {
-            return ts->api->serialize_response(ts, -err, NULL);
+            return (ts->api->serialize_response(ts, -err, NULL));
         }
 
         if (ts->update_subsets & object->subsets) {
@@ -375,34 +367,31 @@ int thingset_common_update(struct thingset_context *ts)
         ts->update_cb();
     }
 
-    return ts->api->serialize_response(ts, THINGSET_STATUS_CHANGED, NULL);
+    return (ts->api->serialize_response(ts, THINGSET_STATUS_CHANGED, NULL));
 }
 
-int thingset_common_exec(struct thingset_context *ts)
-{
+int thingset_common_exec(struct thingset_context* ts) {
     int err;
 
     err = ts->api->deserialize_list_start(ts);
     if (err != 0) {
         err = ts->api->deserialize_finish(ts);
         if (err != 0) {
-            return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Invalid parameters");
+            return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Invalid parameters"));
         }
     }
 
-    if ((ts->endpoint.object->access & THINGSET_WRITE_MASK)
-        && (ts->endpoint.object->type == THINGSET_TYPE_FN_VOID
-            || ts->endpoint.object->type == THINGSET_TYPE_FN_I32))
-    {
+    if ((ts->endpoint.object->access & THINGSET_WRITE_MASK) &&
+        ((ts->endpoint.object->type == THINGSET_TYPE_FN_VOID) || (ts->endpoint.object->type == THINGSET_TYPE_FN_I32))) {
         /* object is generally executable, but are we authorized? */
         if ((ts->endpoint.object->access & THINGSET_WRITE_MASK & ts->auth_flags) == 0) {
-            return ts->api->serialize_response(ts, THINGSET_ERR_UNAUTHORIZED,
-                                               "Authentication required");
+            return (ts->api->serialize_response(ts, THINGSET_ERR_UNAUTHORIZED,
+                                                "Authentication required"));
         }
     }
     else {
-        return ts->api->serialize_response(ts, THINGSET_ERR_FORBIDDEN, "%s is not executable",
-                                           ts->endpoint.object->name);
+        return (ts->api->serialize_response(ts, THINGSET_ERR_FORBIDDEN, "%s is not executable",
+                                           ts->endpoint.object->name));
     }
 
     for (unsigned int i = 0; i < ts->num_objects; i++) {
@@ -410,12 +399,12 @@ int thingset_common_exec(struct thingset_context *ts)
             err = ts->api->deserialize_value(ts, &ts->data_objects[i], false);
             if (err == -THINGSET_ERR_DESERIALIZATION_FINISHED) {
                 /* more child objects found than parameters were passed */
-                return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST,
-                                                   "Not enough parameters");
+                return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST,
+                                                    "Not enough parameters"));
             }
             else if (err != 0) {
                 /* deserializing the value was not successful */
-                return ts->api->serialize_response(ts, -err, NULL);
+                return (ts->api->serialize_response(ts, -err, NULL));
             }
         }
     }
@@ -423,7 +412,7 @@ int thingset_common_exec(struct thingset_context *ts)
     err = ts->api->deserialize_finish(ts);
     if (err != 0) {
         /* more parameters passed than child objects found */
-        return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Too many parameters");
+        return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Too many parameters"));
     }
 
     ts->api->serialize_response(ts, THINGSET_STATUS_CHANGED, NULL);
@@ -434,63 +423,60 @@ int thingset_common_exec(struct thingset_context *ts)
         struct thingset_data_object ret_object = THINGSET_ITEM_INT32(0, 0, "", &ret, 0, 0);
         err = ts->api->serialize_value(ts, &ret_object);
         if (err != 0) {
-            return ts->api->serialize_response(ts, THINGSET_ERR_RESPONSE_TOO_LARGE, NULL);
+            return (ts->api->serialize_response(ts, THINGSET_ERR_RESPONSE_TOO_LARGE, NULL));
         }
     }
     else {
         ts->endpoint.object->data.void_fn();
     }
 
-    return 0;
+    return (0);
 }
 
-int thingset_common_create_delete(struct thingset_context *ts, bool create)
-{
+int thingset_common_create_delete(struct thingset_context* ts, bool create) {
     if (ts->endpoint.object->id == 0) {
-        return ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Endpoint item required");
+        return (ts->api->serialize_response(ts, THINGSET_ERR_BAD_REQUEST, "Endpoint item required"));
     }
 
     if (ts->endpoint.object->type == THINGSET_TYPE_ARRAY) {
-        return ts->api->serialize_response(ts, THINGSET_ERR_NOT_IMPLEMENTED,
-                                           "Arrays not yet supported");
+        return (ts->api->serialize_response(ts, THINGSET_ERR_NOT_IMPLEMENTED,
+                                            "Arrays not yet supported"));
     }
     else if (ts->endpoint.object->type == THINGSET_TYPE_SUBSET) {
-#if CONFIG_THINGSET_IMMUTABLE_OBJECTS
-        return ts->api->serialize_response(ts, THINGSET_ERR_METHOD_NOT_ALLOWED,
-                                           "Subset is immutable");
-#else
-        const char *str_start;
+        #if CONFIG_THINGSET_IMMUTABLE_OBJECTS
+        return (ts->api->serialize_response(ts, THINGSET_ERR_METHOD_NOT_ALLOWED,
+                                            "Subset is immutable"));
+        #else
+        const char* str_start;
         size_t str_len;
         int err = ts->api->deserialize_string(ts, &str_start, &str_len);
         if (err != 0) {
-            return ts->api->serialize_response(ts, THINGSET_ERR_UNSUPPORTED_FORMAT, NULL);
+            return (ts->api->serialize_response(ts, THINGSET_ERR_UNSUPPORTED_FORMAT, NULL));
         }
 
         struct thingset_endpoint element;
         int ret = thingset_endpoint_by_path(ts, &element, str_start, str_len);
-        if (ret >= 0 && element.index == THINGSET_ENDPOINT_INDEX_NONE) {
+        if ((ret >= 0) && (element.index == THINGSET_ENDPOINT_INDEX_NONE)) {
             if (create) {
                 element.object->subsets |= ts->endpoint.object->data.subset;
-                return ts->api->serialize_response(ts, THINGSET_STATUS_CREATED, NULL);
+                return (ts->api->serialize_response(ts, THINGSET_STATUS_CREATED, NULL));
             }
             else {
                 element.object->subsets &= ~ts->endpoint.object->data.subset;
-                return ts->api->serialize_response(ts, THINGSET_STATUS_DELETED, NULL);
+                return (ts->api->serialize_response(ts, THINGSET_STATUS_DELETED, NULL));
             }
         }
-        return ts->api->serialize_response(ts, THINGSET_ERR_NOT_FOUND, NULL);
-#endif /* CONFIG_THINGSET_IMMUTABLE_OBJECTS */
+        return (ts->api->serialize_response(ts, THINGSET_ERR_NOT_FOUND, NULL));
+        #endif /* CONFIG_THINGSET_IMMUTABLE_OBJECTS */
     }
 
-    return ts->api->serialize_response(ts, THINGSET_ERR_METHOD_NOT_ALLOWED, NULL);
+    return (ts->api->serialize_response(ts, THINGSET_ERR_METHOD_NOT_ALLOWED, NULL));
 }
 
-int thingset_common_create(struct thingset_context *ts)
-{
-    return thingset_common_create_delete(ts, true);
+int thingset_common_create(struct thingset_context* ts) {
+    return (thingset_common_create_delete(ts, true));
 }
 
-int thingset_common_delete(struct thingset_context *ts)
-{
-    return thingset_common_create_delete(ts, false);
+int thingset_common_delete(struct thingset_context* ts) {
+    return (thingset_common_create_delete(ts, false));
 }

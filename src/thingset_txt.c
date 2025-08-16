@@ -914,7 +914,7 @@ static int txt_deserialize_skip(struct thingset_context* ts) {
     }
 }
 
-static int txt_deserialize_finish(struct thingset_context* ts) {
+static int txt_deserialize_finish(struct thingset_context const* ts) {
     return ((ts->tok_count == ts->tok_pos) ? 0 : -THINGSET_ERR_BAD_REQUEST);
 }
 

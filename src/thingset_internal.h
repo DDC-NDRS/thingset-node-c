@@ -24,8 +24,7 @@ extern "C" {
  * Also deserialize functions return 0 or negative error code, but never store any error response
  * in the buffer.
  */
-struct thingset_api
-{
+struct thingset_api {
     /**
      * Store a response with the specified error code in the response buffer.
      *
@@ -35,7 +34,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_response)(struct thingset_context *ts, uint8_t code, const char *msg, ...);
+    int (*serialize_response)(struct thingset_context* ts, uint8_t code, char const* msg, ...);
 
     /**
      * Serialize the key (name or ID) of the specified data object. For binary mode, the use_ids
@@ -46,7 +45,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_key)(struct thingset_context *ts, const struct thingset_data_object *object);
+    int (*serialize_key)(struct thingset_context* ts, const struct thingset_data_object* object);
 
     /**
      * Serialize the value of the specified data object.
@@ -56,7 +55,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_value)(struct thingset_context *ts, const struct thingset_data_object *object);
+    int (*serialize_value)(struct thingset_context* ts, const struct thingset_data_object* object);
 
     /**
      * Serialize the path for the specified data object.
@@ -66,9 +65,9 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_path)(struct thingset_context *ts, const struct thingset_data_object *object);
+    int (*serialize_path)(struct thingset_context* ts, const struct thingset_data_object* object);
 
-#ifdef CONFIG_THINGSET_METADATA_ENDPOINT
+    #ifdef CONFIG_THINGSET_METADATA_ENDPOINT
     /**
      * Serialize the metadata (including the type) for the specified data object.
      *
@@ -77,9 +76,9 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_metadata)(struct thingset_context *ts,
-                              const struct thingset_data_object *object);
-#endif /* CONFIG_THINGSET_METADATA_ENDPOINT */
+    int (*serialize_metadata)(struct thingset_context* ts,
+                              const struct thingset_data_object* object);
+    #endif /* CONFIG_THINGSET_METADATA_ENDPOINT */
 
     /**
      * Serialize the key and value of the specified data object.
@@ -89,8 +88,8 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_key_value)(struct thingset_context *ts,
-                               const struct thingset_data_object *object);
+    int (*serialize_key_value)(struct thingset_context* ts,
+                               const struct thingset_data_object* object);
 
     /**
      * Serialize the start of a map (`{` for text mode).
@@ -99,7 +98,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_map_start)(struct thingset_context *ts);
+    int (*serialize_map_start)(struct thingset_context* ts);
 
     /**
      * Serialize the end of a map (`}` for text mode).
@@ -108,7 +107,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_map_end)(struct thingset_context *ts);
+    int (*serialize_map_end)(struct thingset_context* ts);
 
     /**
      * Serialize the start of a list/array (`[` for text mode).
@@ -117,7 +116,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_list_start)(struct thingset_context *ts);
+    int (*serialize_list_start)(struct thingset_context* ts);
 
     /**
      * Serialize the end of a list/array (`]` for text mode).
@@ -126,7 +125,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_list_end)(struct thingset_context *ts);
+    int (*serialize_list_end)(struct thingset_context* ts);
 
     /**
      * Serialize the payload data for the specified subset.
@@ -139,7 +138,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_subsets)(struct thingset_context *ts, uint16_t subsets);
+    int (*serialize_subsets)(struct thingset_context* ts, uint16_t subsets);
 
     /**
      * Serialize the start of a report message.
@@ -152,21 +151,21 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*serialize_report_header)(struct thingset_context *ts, const char *path);
+    int (*serialize_report_header)(struct thingset_context* ts, char const* path);
 
     /**
      * Finalize serialization
      *
      * @param ts Pointer to ThingSet context
      */
-    void (*serialize_finish)(struct thingset_context *ts);
+    void (*serialize_finish)(struct thingset_context* ts);
 
     /**
      * Reset payload deserialization to start parsing at beginning of payload.
      *
      * @param ts Pointer to ThingSet context
      */
-    void (*deserialize_payload_reset)(struct thingset_context *ts);
+    void (*deserialize_payload_reset)(struct thingset_context* ts);
 
     /**
      * Deserialize string with zero-copy.
@@ -177,7 +176,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_string)(struct thingset_context *ts, const char **str_start, size_t *str_len);
+    int (*deserialize_string)(struct thingset_context* ts, char const** str_start, size_t* str_len);
 
     /**
      * Deserialize null value.
@@ -186,7 +185,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_null)(struct thingset_context *ts);
+    int (*deserialize_null)(struct thingset_context* ts);
 
     /**
      * Deserialize the start of a list/array (`[` for text mode).
@@ -195,7 +194,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_list_start)(struct thingset_context *ts);
+    int (*deserialize_list_start)(struct thingset_context* ts);
 
     /**
      * Deserialize the start of a map (`{` for text mode).
@@ -204,7 +203,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_map_start)(struct thingset_context *ts);
+    int (*deserialize_map_start)(struct thingset_context* ts);
 
     /**
      * Deserialize a child object by name or ID for a given parent ID.
@@ -214,8 +213,8 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_child)(struct thingset_context *ts,
-                             const struct thingset_data_object **object);
+    int (*deserialize_child)(struct thingset_context* ts,
+                             const struct thingset_data_object** object);
 
     /**
      * Deserialize any value for the given data object
@@ -230,7 +229,7 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_value)(struct thingset_context *ts, const struct thingset_data_object *object,
+    int (*deserialize_value)(struct thingset_context* ts, const struct thingset_data_object* object,
                              bool check_only);
 
     /**
@@ -240,14 +239,14 @@ struct thingset_api
      *
      * @returns 0 for success or negative ThingSet response code in case of error
      */
-    int (*deserialize_skip)(struct thingset_context *ts);
+    int (*deserialize_skip)(struct thingset_context* ts);
 
     /**
      * Finalize deserialization
      *
      * @param ts Pointer to ThingSet context
      */
-    int (*deserialize_finish)(struct thingset_context *ts);
+    int (*deserialize_finish)(struct thingset_context const* ts);
 };
 
 /**
@@ -259,7 +258,7 @@ struct thingset_api
  *
  * @return Length of response
  */
-int thingset_bin_serialize_response(struct thingset_context *ts, uint8_t code, const char *msg,
+int thingset_bin_serialize_response(struct thingset_context* ts, uint8_t code, char const* msg,
                                     ...);
 
 /**
@@ -271,7 +270,7 @@ int thingset_bin_serialize_response(struct thingset_context *ts, uint8_t code, c
  *
  * @return Length of response
  */
-int thingset_txt_serialize_response(struct thingset_context *ts, uint8_t code, const char *msg,
+int thingset_txt_serialize_response(struct thingset_context* ts, uint8_t code, char const* msg,
                                     ...);
 
 /**
@@ -284,8 +283,8 @@ int thingset_txt_serialize_response(struct thingset_context *ts, uint8_t code, c
  *
  * @return Pointer to the data object or NULL in case of error
  */
-struct thingset_data_object *thingset_get_child_by_name(struct thingset_context *ts,
-                                                        uint16_t parent_id, const char *name,
+struct thingset_data_object* thingset_get_child_by_name(struct thingset_context* ts,
+                                                        uint16_t parent_id, char const* name,
                                                         size_t len);
 
 /**
@@ -296,7 +295,7 @@ struct thingset_data_object *thingset_get_child_by_name(struct thingset_context 
  *
  * @return Pointer to the data object or NULL in case of error
  */
-struct thingset_data_object *thingset_get_object_by_id(struct thingset_context *ts, uint16_t id);
+struct thingset_data_object* thingset_get_object_by_id(struct thingset_context* ts, uint16_t id);
 
 /**
  * Get an object by its path.
@@ -306,9 +305,9 @@ struct thingset_data_object *thingset_get_object_by_id(struct thingset_context *
  * @param path_len Length of path
  * @param index Pointer to an index which may be decoded as part of the path
  */
-struct thingset_data_object *thingset_get_object_by_path(struct thingset_context *ts,
-                                                         const char *path, size_t path_len,
-                                                         int *index);
+struct thingset_data_object* thingset_get_object_by_path(struct thingset_context* ts,
+                                                         char const* path, size_t path_len,
+                                                         int* index);
 
 /**
  * Get the relative path of an object
@@ -320,8 +319,8 @@ struct thingset_data_object *thingset_get_object_by_path(struct thingset_context
  *
  * @return Length of the path or negative ThingSet response code in case of error
  */
-int thingset_get_path(struct thingset_context *ts, char *buf, size_t size,
-                      const struct thingset_data_object *obj);
+int thingset_get_path(struct thingset_context* ts, char* buf, size_t size,
+                      const struct thingset_data_object* obj);
 
 /**
  * Gets the type of a given object as a string.
@@ -331,8 +330,8 @@ int thingset_get_path(struct thingset_context *ts, char *buf, size_t size,
  * @param buf Pointer to the buffer to store the path.
  * @param size Size of the buffer.
  */
-int thingset_get_type_name(struct thingset_context *ts, const struct thingset_data_object *obj,
-                           char *buf, size_t size);
+int thingset_get_type_name(struct thingset_context* ts, const struct thingset_data_object* obj,
+                           char* buf, size_t size);
 
 /**
  * Process text mode desire.
@@ -341,7 +340,7 @@ int thingset_get_type_name(struct thingset_context *ts, const struct thingset_da
  *
  * @return 0 for success or negative ThingSet response code in case of error
  */
-int thingset_txt_desire(struct thingset_context *ts);
+int thingset_txt_desire(struct thingset_context* ts);
 
 /**
  * Process message in text mode.
@@ -350,9 +349,9 @@ int thingset_txt_desire(struct thingset_context *ts);
  *
  * @return see thingset_process_message.
  */
-int thingset_txt_process(struct thingset_context *ts);
+int thingset_txt_process(struct thingset_context* ts);
 
-void thingset_txt_setup(struct thingset_context *ts);
+void thingset_txt_setup(struct thingset_context* ts);
 
 /**
  * Process binary mode desire.
@@ -361,7 +360,7 @@ void thingset_txt_setup(struct thingset_context *ts);
  *
  * @return 0 for success or negative ThingSet response code in case of error
  */
-int thingset_bin_desire(struct thingset_context *ts);
+int thingset_bin_desire(struct thingset_context* ts);
 
 /**
  * Process message in binary mode.
@@ -370,33 +369,33 @@ int thingset_bin_desire(struct thingset_context *ts);
  *
  * @return see thingset_process_message.
  */
-int thingset_bin_process(struct thingset_context *ts);
+int thingset_bin_process(struct thingset_context* ts);
 
-void thingset_bin_setup(struct thingset_context *ts, size_t buf_offset);
+void thingset_bin_setup(struct thingset_context* ts, size_t buf_offset);
 
-int thingset_bin_import_data(struct thingset_context *ts, uint8_t auth_flags,
+int thingset_bin_import_data(struct thingset_context* ts, uint8_t auth_flags,
                              enum thingset_data_format format);
 
-int thingset_bin_import_report(struct thingset_context *ts, uint8_t auth_flags, uint16_t subset);
+int thingset_bin_import_report(struct thingset_context* ts, uint8_t auth_flags, uint16_t subset);
 
-int thingset_bin_import_data_progressively(struct thingset_context *ts, uint8_t auth_flags,
-                                           size_t size, uint32_t *last_id, size_t *consumed);
+int thingset_bin_import_data_progressively(struct thingset_context* ts, uint8_t auth_flags,
+                                           size_t size, uint32_t* last_id, size_t* consumed);
 
-int thingset_bin_export_subsets_progressively(struct thingset_context *ts, uint16_t subsets,
-                                              unsigned int *index, size_t *len);
+int thingset_bin_export_subsets_progressively(struct thingset_context* ts, uint16_t subsets,
+                                              unsigned int* index, size_t* len);
 
-int thingset_common_serialize_group(struct thingset_context *ts,
-                                    const struct thingset_data_object *object);
+int thingset_common_serialize_group(struct thingset_context* ts,
+                                    const struct thingset_data_object* object);
 
-int thingset_common_serialize_record(struct thingset_context *ts,
-                                     const struct thingset_data_object *object, int record_index);
+int thingset_common_serialize_record(struct thingset_context* ts,
+                                     const struct thingset_data_object* object, int record_index);
 
-typedef int (*thingset_common_record_element_action)(
-    struct thingset_context *ts, const struct thingset_data_object *item_offset);
+typedef int (*thingset_common_record_element_action)(struct thingset_context* ts,
+                                                     const struct thingset_data_object* item_offset);
 
-int thingset_common_prepare_record_element(struct thingset_context *ts,
-                                           const struct thingset_data_object *item,
-                                           uint8_t *record_ptr,
+int thingset_common_prepare_record_element(struct thingset_context* ts,
+                                           const struct thingset_data_object* item,
+                                           uint8_t* record_ptr,
                                            thingset_common_record_element_action callback);
 
 /**
@@ -406,7 +405,7 @@ int thingset_common_prepare_record_element(struct thingset_context *ts,
  *
  * @return Length of response or negative ThingSet response code in case of error
  */
-int thingset_common_get(struct thingset_context *ts);
+int thingset_common_get(struct thingset_context* ts);
 
 /**
  * Process FETCH request.
@@ -415,7 +414,7 @@ int thingset_common_get(struct thingset_context *ts);
  *
  * @return Length of response or negative ThingSet response code in case of error
  */
-int thingset_common_fetch(struct thingset_context *ts);
+int thingset_common_fetch(struct thingset_context* ts);
 
 /**
  * Process UPDATE request.
@@ -424,7 +423,7 @@ int thingset_common_fetch(struct thingset_context *ts);
  *
  * @return Length of response or negative ThingSet response code in case of error
  */
-int thingset_common_update(struct thingset_context *ts);
+int thingset_common_update(struct thingset_context* ts);
 
 /**
  * Process EXEC request.
@@ -433,7 +432,7 @@ int thingset_common_update(struct thingset_context *ts);
  *
  * @return Length of response or negative ThingSet response code in case of error
  */
-int thingset_common_exec(struct thingset_context *ts);
+int thingset_common_exec(struct thingset_context* ts);
 
 /**
  * Process CREATE request.
@@ -442,7 +441,7 @@ int thingset_common_exec(struct thingset_context *ts);
  *
  * @return Length of response or negative ThingSet response code in case of error
  */
-int thingset_common_create(struct thingset_context *ts);
+int thingset_common_create(struct thingset_context* ts);
 
 /**
  * Process DELETE request.
@@ -451,7 +450,7 @@ int thingset_common_create(struct thingset_context *ts);
  *
  * @return Length of response or negative ThingSet response code in case of error
  */
-int thingset_common_delete(struct thingset_context *ts);
+int thingset_common_delete(struct thingset_context* ts);
 
 #ifdef __cplusplus
 } /* extern "C" */
