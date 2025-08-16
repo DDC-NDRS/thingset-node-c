@@ -28,7 +28,7 @@
 #endif
 
 static inline int txt_serialize_start(struct thingset_context* ts, char c) {
-    if (ts->rsp_size > ts->rsp_pos + 2) {
+    if (ts->rsp_size > (ts->rsp_pos + 2)) {
         ts->rsp[ts->rsp_pos++] = c;
         return (0);
     }
@@ -254,7 +254,7 @@ static int json_serialize_simple_value(char* buf, size_t size, union thingset_da
 
 static int txt_serialize_value(struct thingset_context* ts,
                                const struct thingset_data_object* object) {
-    char*  buf  = ts->rsp + ts->rsp_pos;
+    char* buf = ts->rsp + ts->rsp_pos;
     size_t size = ts->rsp_size - ts->rsp_pos;
     int ret;
 
@@ -326,9 +326,9 @@ static int txt_serialize_value(struct thingset_context* ts,
             pos += snprintf(buf + pos, size - pos, "],");
         }
         else if ((object->type == THINGSET_TYPE_ARRAY) && (object->data.array != NULL)) {
-            struct thingset_array* array = object->data.array;
+            struct thingset_array const* array = object->data.array;
             pos = snprintf(buf, size, "[");
-            size_t type_size = thingset_type_size(array->element_type);
+            size_t type_size = thingset_type_size((uint8_t)array->element_type);
             for (int i = 0; i < array->num_elements; i++) {
                 /* using uint8_t pointer for byte-wise pointer arithmetics */
                 union thingset_data_pointer data = {
@@ -386,20 +386,25 @@ static int txt_serialize_name(struct thingset_context* ts,
 #ifdef CONFIG_THINGSET_METADATA_ENDPOINT
 static int txt_serialize_metadata(struct thingset_context* ts,
                                   const struct thingset_data_object* object) {
-    int err = txt_serialize_map_start(ts);
+    int err;
+
+    err = txt_serialize_map_start(ts);
     if (err) {
         return (err);
     }
 
-    if ((err = txt_serialize_string(ts, "name", true))) {
+    err = txt_serialize_string(ts, "name", true);
+    if (err) {
         return (-THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
 
-    if ((err = txt_serialize_name(ts, object))) {
+    err = txt_serialize_name(ts, object);
+    if (err) {
         return (-THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
 
-    if ((err = txt_serialize_string(ts, "type", true))) {
+    err = txt_serialize_string(ts, "type", true);
+    if (err) {
         return (-THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
 
@@ -409,11 +414,13 @@ static int txt_serialize_metadata(struct thingset_context* ts,
         return (THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
 
-    if ((err = txt_serialize_string(ts, buf, false))) {
+    err = txt_serialize_string(ts, buf, false);
+    if (err) {
         return (-THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
 
-    if ((err = txt_serialize_map_end(ts))) {
+    err = txt_serialize_map_end(ts);
+    if (err) {
         return (err);
     }
 
@@ -443,15 +450,15 @@ static void txt_serialize_finish(struct thingset_context* ts) {
  * @returns 0 or negative ThingSet reponse code in case of error
  */
 static int txt_parse_endpoint(struct thingset_context* ts) {
-    char* path_begin = (char*)ts->msg + 1;
-    char* path_end = memchr(path_begin, ' ', ts->msg_len - 1);
+    char const* path_begin = (char const*)ts->msg + 1;
+    char const* path_end = memchr(path_begin, ' ', ts->msg_len - 1);
     int path_len;
 
     if (path_end != NULL) {
-        path_len = path_end - path_begin;
+        path_len = (path_end - path_begin);
     }
     else {
-        path_len = ts->msg_len - 1;
+        path_len = (ts->msg_len - 1);
     }
 
     int err = thingset_endpoint_by_path(ts, &ts->endpoint, path_begin, path_len);
@@ -459,7 +466,7 @@ static int txt_parse_endpoint(struct thingset_context* ts) {
         return (err);
     }
 
-    ts->msg_pos += path_len + 1;
+    ts->msg_pos += (path_len + 1);
 
     return (0);
 }
@@ -471,7 +478,7 @@ static int txt_parse_payload(struct thingset_context* ts) {
     struct jsmn_parser parser;
     int ret;
 
-    ts->msg_payload = ts->msg + ts->msg_pos;
+    ts->msg_payload = (ts->msg + ts->msg_pos);
     ts->tok_pos = 0;
 
     jsmn_init(&parser);
@@ -508,11 +515,12 @@ static int txt_deserialize_simple_value(struct thingset_context* ts,
         return (-THINGSET_ERR_DESERIALIZATION_FINISHED);
     }
 
-    char const* buf = ts->msg_payload + ts->tokens[ts->tok_pos].start;
-    size_t len = ts->tokens[ts->tok_pos].end - ts->tokens[ts->tok_pos].start;
+    jsmntok_t const* tokens = &ts->tokens[ts->tok_pos];
+    char const* buf = ts->msg_payload + tokens->start;
+    size_t len = tokens->end - tokens->start;
 
-    if ((ts->tokens[ts->tok_pos].type != JSMN_PRIMITIVE) &&
-        (ts->tokens[ts->tok_pos].type != JSMN_STRING)) {
+    if ((tokens->type != JSMN_PRIMITIVE) &&
+        (tokens->type != JSMN_STRING)) {
         return (-THINGSET_ERR_UNSUPPORTED_FORMAT);
     }
 
@@ -585,7 +593,7 @@ static int txt_deserialize_simple_value(struct thingset_context* ts,
             break;
 
         case THINGSET_TYPE_STRING :
-            if (ts->tokens[ts->tok_pos].type != JSMN_STRING || (unsigned int)detail <= len) {
+            if (tokens->type != JSMN_STRING || (unsigned int)detail <= len) {
                 return (-THINGSET_ERR_REQUEST_TOO_LARGE);
             }
 
@@ -644,7 +652,7 @@ static int txt_deserialize_simple_value(struct thingset_context* ts,
 
         #if CONFIG_THINGSET_BYTES_TYPE_SUPPORT
         case THINGSET_TYPE_BYTES : {
-            if ((ts->tokens[ts->tok_pos].type != JSMN_STRING) ||
+            if ((tokens->type != JSMN_STRING) ||
                 (data.bytes->max_bytes) < ((len / 4) * 3)) {
                 return (-THINGSET_ERR_REQUEST_TOO_LARGE);
             }
@@ -689,7 +697,7 @@ static int txt_deserialize_value(struct thingset_context* ts,
             return (-THINGSET_ERR_UNSUPPORTED_FORMAT);
         }
 
-        size_t type_size = thingset_type_size(array->element_type);
+        size_t type_size = thingset_type_size((uint8_t)array->element_type);
         int index = 0;
         do {
             /* using uint8_t pointer for byte-wise pointer arithmetics */
@@ -706,7 +714,7 @@ static int txt_deserialize_value(struct thingset_context* ts,
         } while (index < array->max_elements);
 
         if (!check_only) {
-            array->num_elements = index;
+            array->num_elements = (uint16_t)index;
         }
 
         if (err == -THINGSET_ERR_DESERIALIZATION_FINISHED) {
@@ -796,7 +804,7 @@ static int txt_serialize_subsets(struct thingset_context* ts, uint16_t subsets) 
 
 static int txt_serialize_report_header(struct thingset_context* ts, char const* path) {
     ts->rsp_pos = snprintf(ts->rsp, ts->rsp_size, "#%s ", path);
-    if ((ts->rsp_pos < 0) || (ts->rsp_pos > ts->rsp_size)) {
+    if (((int)ts->rsp_pos < 0) || (ts->rsp_pos > ts->rsp_size)) {
         return (-THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
     else {
@@ -838,7 +846,7 @@ static int txt_deserialize_child(struct thingset_context* ts,
         return (-THINGSET_ERR_BAD_REQUEST);
     }
 
-    char const* name = (char*)ts->msg_payload + ts->tokens[ts->tok_pos].start;
+    char const* name = (char const*)ts->msg_payload + ts->tokens[ts->tok_pos].start;
     size_t name_len = ts->tokens[ts->tok_pos].end - ts->tokens[ts->tok_pos].start;
 
     if (ts->endpoint.object->id == THINGSET_ID_METADATA) {
@@ -859,7 +867,7 @@ static int txt_deserialize_child(struct thingset_context* ts,
 
 static int txt_deserialize_null(struct thingset_context* ts) {
     if (ts->tok_pos < ts->tok_count) {
-        jsmntok_t* token = &ts->tokens[ts->tok_pos];
+        jsmntok_t const* token = &ts->tokens[ts->tok_pos];
         if ((token->type == JSMN_PRIMITIVE) &&
             (strncmp(ts->msg_payload + token->start, "null", token->end - token->start) == 0)) {
             ts->tok_pos++;
@@ -989,13 +997,13 @@ int thingset_txt_process(struct thingset_context* ts) {
 
     ret = txt_parse_endpoint(ts);
     if (ret != 0) {
-        ts->api->serialize_response(ts, -ret, "Invalid endpoint");
+        ts->api->serialize_response(ts, (uint8_t)-ret, "Invalid endpoint");
         goto out;
     }
 
     ret = txt_parse_payload(ts);
     if (ret != 0) {
-        ts->api->serialize_response(ts, -ret, "JSON parsing error");
+        ts->api->serialize_response(ts, (uint8_t)-ret, "JSON parsing error");
         goto out;
     }
 

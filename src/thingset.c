@@ -81,7 +81,6 @@ void thingset_init(struct thingset_context* ts, struct thingset_data_object* obj
 
 void thingset_init_global(struct thingset_context* ts) {
     /* duplicates are checked at compile-time */
-
     ts->data_objects = TYPE_SECTION_START(thingset_data_object);
     STRUCT_SECTION_COUNT(thingset_data_object, &ts->num_objects);
     thingset_init_common(ts);
@@ -100,7 +99,8 @@ int thingset_process_message(struct thingset_context* ts, uint8_t const* msg, si
         return (-THINGSET_ERR_INTERNAL_SERVER_ERR);
     }
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return (-THINGSET_ERR_INTERNAL_SERVER_ERR);
     }
@@ -129,8 +129,11 @@ int thingset_export_subsets_progressively(struct thingset_context* ts, uint8_t* 
                                           size_t buf_size, uint16_t subsets,
                                           enum thingset_data_format format, unsigned int* index,
                                           size_t* len) {
+    int ret;
+
     if (*index == 0) {
-        if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+        ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+        if (ret != 0) {
             LOG_ERR("ThingSet context lock timed out");
             return (-THINGSET_ERR_INTERNAL_SERVER_ERR);
         }
@@ -151,7 +154,7 @@ int thingset_export_subsets_progressively(struct thingset_context* ts, uint8_t* 
         }
     }
 
-    int ret = thingset_bin_export_subsets_progressively(ts, subsets, index, len);
+    ret = thingset_bin_export_subsets_progressively(ts, subsets, index, len);
     if (ret <= 0) {
         k_sem_give(&ts->lock);
     }
@@ -163,7 +166,8 @@ int thingset_export_subsets(struct thingset_context* ts, uint8_t* buf, size_t bu
                             uint16_t subsets, enum thingset_data_format format) {
     int ret;
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return (-THINGSET_ERR_INTERNAL_SERVER_ERR);
     }
@@ -205,7 +209,8 @@ int thingset_export_item(struct thingset_context* ts, uint8_t* buf, size_t buf_s
                          const struct thingset_data_object* obj, enum thingset_data_format format) {
     int ret;
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return (-THINGSET_ERR_INTERNAL_SERVER_ERR);
     }
@@ -264,10 +269,11 @@ struct thingset_data_object* thingset_iterate_subsets(struct thingset_context* t
 int thingset_import_data_progressively(struct thingset_context* ts, uint8_t const* data, size_t len,
                                        enum thingset_data_format format, uint8_t auth_flags,
                                        uint32_t* last_id, size_t* consumed) {
-    int err = 0;
+    int ret;
 
     if (*last_id == 0) {
-        if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+        ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+        if (ret != 0) {
             LOG_ERR("ThingSet context lock timed out");
             return -THINGSET_ERR_INTERNAL_SERVER_ERR;
         }
@@ -288,22 +294,22 @@ int thingset_import_data_progressively(struct thingset_context* ts, uint8_t cons
                 break;
 
             default :
-                err = -THINGSET_ERR_NOT_IMPLEMENTED;
+                ret = -THINGSET_ERR_NOT_IMPLEMENTED;
                 k_sem_give(&ts->lock);
                 break;
         }
 
-        if (err) {
-            return (err);
+        if (ret != 0) {
+            return (ret);
         }
     }
 
-    err = thingset_bin_import_data_progressively(ts, auth_flags, len, last_id, consumed);
-    if (err < 0) {
+    ret = thingset_bin_import_data_progressively(ts, auth_flags, len, last_id, consumed);
+    if (ret < 0) {
         k_sem_give(&ts->lock);
     }
 
-    return (err);
+    return (ret);
 }
 
 int thingset_import_data_progressively_end(struct thingset_context* ts) {
@@ -313,9 +319,10 @@ int thingset_import_data_progressively_end(struct thingset_context* ts) {
 
 int thingset_import_data(struct thingset_context* ts, uint8_t const* data, size_t len,
                          uint8_t auth_flags, enum thingset_data_format format) {
-    int err;
+    int ret;
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return -THINGSET_ERR_INTERNAL_SERVER_ERR;
     }
@@ -333,24 +340,25 @@ int thingset_import_data(struct thingset_context* ts, uint8_t const* data, size_
             thingset_bin_setup(ts, 0);
             ts->msg_payload = data;
             ts->api->deserialize_payload_reset(ts);
-            err = thingset_bin_import_data(ts, auth_flags, format);
+            ret = thingset_bin_import_data(ts, auth_flags, format);
             break;
 
         default :
-            err = -THINGSET_ERR_NOT_IMPLEMENTED;
+            ret = -THINGSET_ERR_NOT_IMPLEMENTED;
             break;
     }
 
     k_sem_give(&ts->lock);
 
-    return (err);
+    return (ret);
 }
 
 int thingset_import_report(struct thingset_context* ts, uint8_t const* data, size_t len,
                            uint8_t auth_flags, enum thingset_data_format format, uint16_t subset) {
-    int err;
+    int ret;
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return -THINGSET_ERR_INTERNAL_SERVER_ERR;
     }
@@ -366,19 +374,19 @@ int thingset_import_report(struct thingset_context* ts, uint8_t const* data, siz
         case THINGSET_BIN_IDS_VALUES :
             ts->endpoint.use_ids = true;
             thingset_bin_setup(ts, 0);
-            ts->decoder->elem_count = 2;
+            ts->decoder[0].elem_count = 2;
             ts->msg_payload = data;
-            err = thingset_bin_import_report(ts, auth_flags, subset);
+            ret = thingset_bin_import_report(ts, auth_flags, subset);
             break;
 
         default :
-            err = -THINGSET_ERR_NOT_IMPLEMENTED;
+            ret = -THINGSET_ERR_NOT_IMPLEMENTED;
             break;
     }
 
     k_sem_give(&ts->lock);
 
-    return (err);
+    return (ret);
 }
 
 static int deserialize_value_callback(struct thingset_context* ts,
@@ -388,9 +396,10 @@ static int deserialize_value_callback(struct thingset_context* ts,
 
 int thingset_import_record(struct thingset_context* ts, uint8_t const* data, size_t len,
                            struct thingset_endpoint const* endpoint, enum thingset_data_format format) {
-    int err;
+    int ret;
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return -THINGSET_ERR_INTERNAL_SERVER_ERR;
     }
@@ -421,50 +430,51 @@ int thingset_import_record(struct thingset_context* ts, uint8_t const* data, siz
             break;
 
         default :
-            err = -THINGSET_ERR_NOT_IMPLEMENTED;
+            ret = -THINGSET_ERR_NOT_IMPLEMENTED;
             goto out;
     }
 
-    err = ts->api->deserialize_map_start(ts);
-    if (err != 0) {
+    ret = ts->api->deserialize_map_start(ts);
+    if (ret != 0) {
         goto out;
     }
 
     const struct thingset_data_object* item;
-    while ((err = ts->api->deserialize_child(ts, &item)) != -THINGSET_ERR_DESERIALIZATION_FINISHED) {
-        if (err == -THINGSET_ERR_NOT_FOUND) {
+    while ((ret = ts->api->deserialize_child(ts, &item)) != -THINGSET_ERR_DESERIALIZATION_FINISHED) {
+        if (ret == -THINGSET_ERR_NOT_FOUND) {
             /* silently ignore non-existing record items and skip value */
             ts->api->deserialize_skip(ts);
             continue;
         }
-        else if (err != 0) {
+        else if (ret != 0) {
             goto out;
         }
 
         struct thingset_records const* records = ts->endpoint.object->data.records;
         uint8_t* record_ptr =
             (uint8_t*)records->records + (ts->endpoint.index * records->record_size);
-        err = thingset_common_prepare_record_element(ts, item, record_ptr,
+        ret = thingset_common_prepare_record_element(ts, item, record_ptr,
                                                      deserialize_value_callback);
 
-        if (err != 0) {
+        if (ret != 0) {
             goto out;
         }
     }
 
-    err = err == -THINGSET_ERR_DESERIALIZATION_FINISHED ? 0 : ts->api->deserialize_finish(ts);
+    ret = (ret == -THINGSET_ERR_DESERIALIZATION_FINISHED) ? 0 : ts->api->deserialize_finish(ts);
 
 out :
     k_sem_give(&ts->lock);
 
-    return (err);
+    return (ret);
 }
 
 int thingset_report_path(struct thingset_context* ts, char* buf, size_t buf_size, char const* path,
                          enum thingset_data_format format) {
-    int err;
+    int ret;
 
-    if (k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS)) != 0) {
+    ret = k_sem_take(&ts->lock, K_MSEC(THINGSET_CONTEXT_LOCK_TIMEOUT_MS));
+    if (ret != 0) {
         LOG_ERR("ThingSet context lock timed out");
         return -THINGSET_ERR_INTERNAL_SERVER_ERR;
     }
@@ -473,12 +483,12 @@ int thingset_report_path(struct thingset_context* ts, char* buf, size_t buf_size
     ts->rsp_size = buf_size;
     ts->rsp_pos  = 0;
 
-    err = thingset_endpoint_by_path(ts, &ts->endpoint, path, strlen(path));
-    if (err != 0) {
+    ret = thingset_endpoint_by_path(ts, &ts->endpoint, path, strlen(path));
+    if (ret != 0) {
         goto out;
     }
     else if (ts->endpoint.object == NULL) {
-        err = -THINGSET_ERR_BAD_REQUEST;
+        ret = -THINGSET_ERR_BAD_REQUEST;
         goto out;
     }
 
@@ -500,52 +510,52 @@ int thingset_report_path(struct thingset_context* ts, char* buf, size_t buf_size
             break;
 
         default :
-            err = -THINGSET_ERR_NOT_IMPLEMENTED;
+            ret = -THINGSET_ERR_NOT_IMPLEMENTED;
             goto out;
     }
 
-    err = ts->api->serialize_report_header(ts, path);
-    if (err != 0) {
+    ret = ts->api->serialize_report_header(ts, path);
+    if (ret != 0) {
         goto out;
     }
 
     switch (ts->endpoint.object->type) {
         case THINGSET_TYPE_GROUP :
-            err = thingset_common_serialize_group(ts, ts->endpoint.object);
+            ret = thingset_common_serialize_group(ts, ts->endpoint.object);
             break;
 
         case THINGSET_TYPE_SUBSET :
-            err = ts->api->serialize_subsets(ts, (uint16_t)ts->endpoint.object->data.subset);
+            ret = ts->api->serialize_subsets(ts, (uint16_t)ts->endpoint.object->data.subset);
             break;
 
         case THINGSET_TYPE_FN_VOID :
         case THINGSET_TYPE_FN_I32 :
             /* bad request, as we can't read exec object's values */
-            err = -THINGSET_ERR_BAD_REQUEST;
+            ret = -THINGSET_ERR_BAD_REQUEST;
             break;
 
         case THINGSET_TYPE_RECORDS :
             if (ts->endpoint.index != THINGSET_ENDPOINT_INDEX_NONE) {
-                err = thingset_common_serialize_record(ts, ts->endpoint.object, ts->endpoint.index);
+                ret = thingset_common_serialize_record(ts, ts->endpoint.object, ts->endpoint.index);
                 break;
             }
             /* fallthrough */
 
         default :
-            err = ts->api->serialize_value(ts, ts->endpoint.object);
+            ret = ts->api->serialize_value(ts, ts->endpoint.object);
             break;
     }
 
     ts->api->serialize_finish(ts);
 
-    if (err == 0) {
-        err = ts->rsp_pos;
+    if (ret == 0) {
+        ret = ts->rsp_pos;
     }
 
 out :
     k_sem_give(&ts->lock);
 
-    return (err);
+    return (ret);
 }
 
 void thingset_set_authentication(struct thingset_context* ts, uint8_t flags) {

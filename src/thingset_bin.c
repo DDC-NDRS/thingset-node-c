@@ -19,11 +19,13 @@
 
 static void bin_decoder_init(struct thingset_context* ts, uint8_t const* payload,
                              size_t payload_len) {
-    zcbor_new_decode_state(ts->decoder, ZCBOR_ARRAY_SIZE(ts->decoder), payload, payload_len, 1,
+    zcbor_state_t* decoder = ts->decoder;
+
+    zcbor_new_decode_state(decoder, ZCBOR_ARRAY_SIZE(ts->decoder), payload, payload_len, 1,
                            NULL, 0);
 
     /* required to accept incoming data which does not use the most compact encoding */
-    ts->decoder->constant_state->enforce_canonical = false;
+    decoder->constant_state->enforce_canonical = false;
 }
 
 static int bin_serialize_map_start(struct thingset_context* ts) {
@@ -44,26 +46,27 @@ static int bin_serialize_list_end(struct thingset_context* ts) {
 
 static int bin_serialize_response(struct thingset_context* ts, uint8_t code, char const* msg, ...) {
     va_list vargs;
+    zcbor_state_t* encoder = ts->encoder;
 
     ts->rsp[0] = code;
 
-    zcbor_update_state(ts->encoder, ts->rsp + 1, ts->rsp_size - 1);
-    zcbor_nil_put(ts->encoder, NULL);
+    zcbor_update_state(encoder, ts->rsp + 1, ts->rsp_size - 1);
+    zcbor_nil_put(encoder, NULL);
 
     if (THINGSET_ERROR(code)) {
         if (msg != NULL) {
             /* zcbor uses memmove internally, so we can use the encoder buffer with an
              * offset for the string header for temporary storage of the message
              */
-            uint8_t* msg_buf_start = ts->encoder->payload_mut + 2;
-            size_t msg_buf_size = ts->encoder->payload_end - msg_buf_start;
+            uint8_t* msg_buf_start = encoder->payload_mut + 2;
+            size_t msg_buf_size = encoder->payload_end - msg_buf_start;
 
             va_start(vargs, msg);
             int ret = vsnprintf((char*)msg_buf_start, msg_buf_size, msg, vargs);
             va_end(vargs);
 
             if ((ret >= 0) && (ret < (int)msg_buf_size)) {
-                zcbor_tstr_encode_ptr(ts->encoder, msg_buf_start, ret);
+                zcbor_tstr_encode_ptr(encoder, msg_buf_start, ret);
             }
         }
     }
@@ -164,15 +167,16 @@ static int bin_serialize_path(struct thingset_context* ts,
     /* zcbor uses memmove internally, so we can use the encoder buffer with an
      * offset for the string header for temporary storage of the path
      */
-    uint8_t* buf_path_start = ts->encoder->payload_mut + 2;
-    size_t buf_path_size = ts->encoder->payload_end - buf_path_start;
+    zcbor_state_t* encoder = ts->encoder;
+    uint8_t* buf_path_start = encoder->payload_mut + 2;
+    size_t buf_path_size = encoder->payload_end - buf_path_start;
 
     int path_len = thingset_get_path(ts, (char*)buf_path_start, buf_path_size, object);
     if (path_len < 0) {
         return (-THINGSET_ERR_RESPONSE_TOO_LARGE);
     }
 
-    return (zcbor_tstr_encode_ptr(ts->encoder, buf_path_start, path_len)
+    return (zcbor_tstr_encode_ptr(encoder, buf_path_start, path_len)
             ? 0
             : -THINGSET_ERR_RESPONSE_TOO_LARGE);
 }
@@ -343,20 +347,21 @@ static void bin_serialize_finish(struct thingset_context* ts) {
 static int bin_parse_endpoint(struct thingset_context* ts) {
     struct zcbor_string path;
     uint32_t id;
+    zcbor_state_t* decoder = ts->decoder;
     int err = -THINGSET_ERR_NOT_FOUND;
 
-    if (zcbor_tstr_decode(ts->decoder, &path) == true) {
+    if (zcbor_tstr_decode(decoder, &path) == true) {
         err = thingset_endpoint_by_path(ts, &ts->endpoint, path.value, path.len);
     }
-    else if ((zcbor_uint32_decode(ts->decoder, &id) == true) && (id <= UINT16_MAX)) {
+    else if ((zcbor_uint32_decode(decoder, &id) == true) && (id <= UINT16_MAX)) {
         err = thingset_endpoint_by_id(ts, &ts->endpoint, (uint16_t)id);
     }
-    else if (zcbor_list_start_decode(ts->decoder) == true) {
-        if ((zcbor_uint32_decode(ts->decoder, &id) == true) && (id <= UINT16_MAX)) {
+    else if (zcbor_list_start_decode(decoder) == true) {
+        if ((zcbor_uint32_decode(decoder, &id) == true) && (id <= UINT16_MAX)) {
             err = thingset_endpoint_by_id(ts, &ts->endpoint, (uint16_t)id);
             if (err == 0) {
-                if (!zcbor_int32_decode(ts->decoder, &ts->endpoint.index) || (ts->endpoint.index < 0) ||
-                    !zcbor_list_end_decode(ts->decoder)) {
+                if (!zcbor_int32_decode(decoder, &ts->endpoint.index) || (ts->endpoint.index < 0) ||
+                    !zcbor_list_end_decode(decoder)) {
                     err = -THINGSET_ERR_BAD_REQUEST;
                 }
                 /* else: ID and index found, return 0 */
@@ -369,7 +374,7 @@ static int bin_parse_endpoint(struct thingset_context* ts) {
         return (err);
     }
 
-    ts->msg_payload = ts->decoder->payload;
+    ts->msg_payload = decoder->payload;
 
     /* re-initialize decoder for payload parsing */
     bin_decoder_init(ts, ts->msg_payload, ts->msg_len - (ts->msg_payload - ts->msg));
@@ -383,6 +388,8 @@ int thingset_bin_desire(struct thingset_context* ts) {
 
 int thingset_bin_export_subsets_progressively(struct thingset_context* ts, uint16_t subsets,
                                               unsigned int* index, size_t* len) {
+    zcbor_state_t* encoder = ts->encoder;
+
     if (*index == 0) {
         size_t num_elements = 0;
         for (size_t i = 0; i < ts->num_objects; i++) {
@@ -390,7 +397,7 @@ int thingset_bin_export_subsets_progressively(struct thingset_context* ts, uint1
                 num_elements++;
             }
         }
-        zcbor_map_start_encode(ts->encoder, num_elements);
+        zcbor_map_start_encode(encoder, num_elements);
     }
 
     while (*index < ts->num_objects) {
@@ -404,7 +411,7 @@ int thingset_bin_export_subsets_progressively(struct thingset_context* ts, uint1
                     /* reset pointer to position before we encoded this key-value
                      * pair and ask for more data
                      */
-                    ts->encoder->payload_mut = ts->rsp;
+                    encoder->payload_mut = ts->rsp;
                     ts->rsp_pos = 0;
 
                     return (1);
@@ -420,7 +427,7 @@ int thingset_bin_export_subsets_progressively(struct thingset_context* ts, uint1
         }
 
         (*index)++;
-        ts->rsp_pos = ts->encoder->payload - ts->rsp;
+        ts->rsp_pos = encoder->payload - ts->rsp;
         *len = ts->rsp_pos;
     }
 
@@ -484,6 +491,7 @@ static void bin_deserialize_payload_reset(struct thingset_context* ts) {
 static int bin_deserialize_string(struct thingset_context* ts, char const** str_start,
                                   size_t* str_len) {
     struct zcbor_string str;
+
     if (zcbor_tstr_decode(ts->decoder, &str) == true) {
         *str_start = str.value;
         *str_len   = str.len;
@@ -502,19 +510,20 @@ static int bin_deserialize_child(struct thingset_context* ts,
                                  const struct thingset_data_object** object) {
     struct zcbor_string name;
     uint32_t id;
+    zcbor_state_t* decoder = ts->decoder;
 
-    if ((ts->decoder->payload_end == ts->decoder->payload) || (ts->decoder->elem_count == 0)) {
+    if ((decoder->payload_end == decoder->payload) || (decoder->elem_count == 0)) {
         return (-THINGSET_ERR_DESERIALIZATION_FINISHED);
     }
 
-    if (zcbor_tstr_decode(ts->decoder, &name) == true) {
+    if (zcbor_tstr_decode(decoder, &name) == true) {
         *object = thingset_get_child_by_name(ts, ts->endpoint.object->id, name.value, name.len);
         if (*object == NULL) {
             return (-THINGSET_ERR_NOT_FOUND);
         }
     }
-    else if ((zcbor_uint32_decode(ts->decoder, &id) == true) && (id <= UINT16_MAX)) {
-        *object = thingset_get_object_by_id(ts, id);
+    else if ((zcbor_uint32_decode(decoder, &id) == true) && (id <= UINT16_MAX)) {
+        *object = thingset_get_object_by_id(ts, (uint16_t)id);
         if (*object == NULL) {
             return (-THINGSET_ERR_NOT_FOUND);
         }
@@ -542,53 +551,54 @@ static int bin_deserialize_map_start(struct thingset_context* ts) {
 static int bin_deserialize_simple_value(struct thingset_context* ts,
                                         union thingset_data_pointer data, int type, int detail,
                                         bool check_only) {
+    zcbor_state_t* decoder = ts->decoder;
     bool success;
 
-    if (ts->decoder->payload_end == ts->decoder->payload) {
+    if (decoder->payload_end == decoder->payload) {
         return (-THINGSET_ERR_DESERIALIZATION_FINISHED);
     }
 
     switch (type) {
         #if CONFIG_THINGSET_64BIT_TYPES_SUPPORT
         case THINGSET_TYPE_U64 :
-            success = zcbor_uint64_decode(ts->decoder, data.u64);
+            success = zcbor_uint64_decode(decoder, data.u64);
             break;
 
         case THINGSET_TYPE_I64 :
-            success = zcbor_int64_decode(ts->decoder, data.i64);
+            success = zcbor_int64_decode(decoder, data.i64);
             break;
         #endif
 
         case THINGSET_TYPE_U32 :
-            success = zcbor_uint32_decode(ts->decoder, data.u32);
+            success = zcbor_uint32_decode(decoder, data.u32);
             break;
 
         case THINGSET_TYPE_I32 :
-            success = zcbor_int32_decode(ts->decoder, data.i32);
+            success = zcbor_int32_decode(decoder, data.i32);
             break;
 
         case THINGSET_TYPE_U16 :
-            success = zcbor_uint_decode(ts->decoder, data.u16, 2);
+            success = zcbor_uint_decode(decoder, data.u16, 2);
             break;
 
         case THINGSET_TYPE_I16 :
-            success = zcbor_int_decode(ts->decoder, data.i16, 2);
+            success = zcbor_int_decode(decoder, data.i16, 2);
             break;
 
         case THINGSET_TYPE_U8 :
-            success = zcbor_uint_decode(ts->decoder, data.u8, 1);
+            success = zcbor_uint_decode(decoder, data.u8, 1);
             break;
 
         case THINGSET_TYPE_I8 :
-            success = zcbor_int_decode(ts->decoder, data.i8, 1);
+            success = zcbor_int_decode(decoder, data.i8, 1);
             break;
 
         case THINGSET_TYPE_F32 :
-            success = zcbor_float16_32_decode(ts->decoder, data.f32);
+            success = zcbor_float16_32_decode(decoder, data.f32);
             if (!success) {
                 /* try integer type */
                 int32_t tmp;
-                if (zcbor_int32_decode(ts->decoder, &tmp) == true) {
+                if (zcbor_int32_decode(decoder, &tmp) == true) {
                     *data.f32 = (float)tmp;
                     success = true;
                 }
@@ -599,16 +609,18 @@ static int bin_deserialize_simple_value(struct thingset_context* ts,
         case THINGSET_TYPE_DECFRAC : {
             int32_t exponent = -detail;
             int32_t* mantissa = data.decfrac;
-            if (zcbor_tag_expect(ts->decoder, ZCBOR_TAG_DECFRAC_ARR)) {
-                success = zcbor_list_start_decode(ts->decoder);
+            if (zcbor_tag_expect(decoder, ZCBOR_TAG_DECFRAC_ARR)) {
+                success = zcbor_list_start_decode(decoder);
                 int32_t mantissa_tmp;
                 int32_t exponent_received;
-                success = success && zcbor_int32_decode(ts->decoder, &exponent_received);
-                success = success && zcbor_int32_decode(ts->decoder, &mantissa_tmp);
+
+                success = success && zcbor_int32_decode(decoder, &exponent_received);
+                success = success && zcbor_int32_decode(decoder, &mantissa_tmp);
 
                 for (int i = exponent_received; i < exponent; i++) {
                     mantissa_tmp /= 10;
                 }
+
                 for (int i = exponent_received; i > exponent; i--) {
                     mantissa_tmp *= 10;
                 }
@@ -618,23 +630,27 @@ static int bin_deserialize_simple_value(struct thingset_context* ts,
                 /* try integer and float types */
                 int32_t i32;
                 float f32;
-                if (zcbor_int32_decode(ts->decoder, &i32) == true) {
+
+                if (zcbor_int32_decode(decoder, &i32) == true) {
                     for (int i = 0; i < exponent; i++) {
                         i32 /= 10;
                     }
+
                     for (int i = 0; i > exponent; i--) {
                         i32 *= 10;
                     }
                     *mantissa = i32;
                     success = true;
                 }
-                else if (zcbor_float16_32_decode(ts->decoder, &f32) == true) {
+                else if (zcbor_float16_32_decode(decoder, &f32) == true) {
                     for (int i = 0; i < exponent; i++) {
                         f32 /= 10.0F;
                     }
+
                     for (int i = 0; i > exponent; i--) {
                         f32 *= 10.0F;
                     }
+
                     *mantissa = (int32_t)f32;
                     success = true;
                 }
@@ -647,12 +663,12 @@ static int bin_deserialize_simple_value(struct thingset_context* ts,
         #endif
 
         case THINGSET_TYPE_BOOL :
-            success = zcbor_bool_decode(ts->decoder, data.b);
+            success = zcbor_bool_decode(decoder, data.b);
             break;
 
         case THINGSET_TYPE_STRING : {
             struct zcbor_string str;
-            success = zcbor_tstr_decode(ts->decoder, &str);
+            success = zcbor_tstr_decode(decoder, &str);
             if (success && ((int)str.len < detail)) {
                 if (!check_only) {
                     strncpy(data.str, str.value, str.len);
@@ -669,7 +685,7 @@ static int bin_deserialize_simple_value(struct thingset_context* ts,
         case THINGSET_TYPE_BYTES : {
             struct thingset_bytes* bytes_buf = data.bytes;
             struct zcbor_string bstr;
-            success = zcbor_bstr_decode(ts->decoder, &bstr);
+            success = zcbor_bstr_decode(decoder, &bstr);
             if (success && bstr.len <= bytes_buf->max_bytes) {
                 if (!check_only) {
                     memcpy(bytes_buf->bytes, bstr.value, bstr.len);
@@ -708,7 +724,7 @@ static int bin_deserialize_value(struct thingset_context* ts,
                     break;
                 }
 
-                size_t type_size = thingset_type_size(array->element_type);
+                size_t type_size = thingset_type_size((uint8_t)array->element_type);
                 int index = 0;
 
                 do {
@@ -726,7 +742,7 @@ static int bin_deserialize_value(struct thingset_context* ts,
                 } while (index < array->max_elements);
 
                 if (!check_only) {
-                    array->num_elements = index;
+                    array->num_elements = (uint16_t)index;
                 }
 
                 success = zcbor_list_end_decode(ts->decoder);
@@ -739,7 +755,7 @@ static int bin_deserialize_value(struct thingset_context* ts,
                 struct thingset_records const* records = object->data.records;
                 uint32_t id;
 
-                success = zcbor_list_start_decode(ts->decoder);
+                (void) zcbor_list_start_decode(ts->decoder);
                 for (unsigned int i = 0; i < records->num_records; i++) {
                     success = zcbor_map_start_decode(ts->decoder);
                     if (!success) {
@@ -762,7 +778,7 @@ static int bin_deserialize_value(struct thingset_context* ts,
                                                            check_only);
                     }
 
-                    success = zcbor_map_end_decode(ts->decoder);
+                    (void) zcbor_map_end_decode(ts->decoder);
                 }
 
                 success = zcbor_list_end_decode(ts->decoder);
@@ -830,6 +846,8 @@ inline void thingset_bin_setup(struct thingset_context* ts, size_t rsp_buf_offse
 
 int thingset_bin_import_data_progressively(struct thingset_context* ts, uint8_t auth_flags,
                                            size_t size, uint32_t* last_id, size_t* consumed) {
+    zcbor_state_t* decoder = ts->decoder;
+
     if (*last_id == 0) {
         int err = ts->api->deserialize_map_start(ts);
         if (err) {
@@ -841,28 +859,29 @@ int thingset_bin_import_data_progressively(struct thingset_context* ts, uint8_t 
      * (this handles both the first case, where we've decoded the two bytes of the map start,
      * and subsequent cases, where we set the payload pointer back to the start of the buffer)
      */
-    zcbor_new_decode_state(ts->decoder, ZCBOR_ARRAY_SIZE(ts->decoder), ts->decoder->payload_mut,
-                           size - (ts->decoder->payload - ts->msg), ts->decoder->elem_count, NULL,
+    zcbor_new_decode_state(decoder, ZCBOR_ARRAY_SIZE(ts->decoder), decoder->payload_mut,
+                           size - (decoder->payload - ts->msg), decoder->elem_count, NULL,
                            0);
-    ts->decoder->constant_state->enforce_canonical = false;
+    decoder->constant_state->enforce_canonical = false;
 
     uint32_t id;
     size_t successfully_parsed_bytes = 0;
-    zcbor_state_t state = *ts->decoder;
-    while (zcbor_uint32_decode(ts->decoder, &id)) {
+    zcbor_state_t state = *decoder;
+
+    while (zcbor_uint32_decode(decoder, &id)) {
         if (id <= UINT16_MAX) {
             const struct thingset_data_object* object = thingset_get_object_by_id(ts, id);
             if (object != NULL && (object->access & THINGSET_WRITE_MASK & auth_flags) != 0) {
                 if (ts->api->deserialize_value(ts, object, false) == 0) {
-                    successfully_parsed_bytes = ts->decoder->payload - ts->msg;
+                    successfully_parsed_bytes = decoder->payload - ts->msg;
                 }
                 else {
                     if (id == *last_id) {
                         /* we got stuck here last time, so no point going back and asking
                             for more data; just skip it and move on */
-                        if (zcbor_any_skip(ts->decoder, NULL)) {
-                            state = *ts->decoder;
-                            successfully_parsed_bytes = ts->decoder->payload - ts->msg;
+                        if (zcbor_any_skip(decoder, NULL)) {
+                            state = *decoder;
+                            successfully_parsed_bytes = decoder->payload - ts->msg;
                         }
                         else {
                             /* if we can't even skip the element, the data must be corrupted */
@@ -872,8 +891,8 @@ int thingset_bin_import_data_progressively(struct thingset_context* ts, uint8_t 
                     }
                     else {
                         /* reset decoder position to the beginning of the buffer */
-                        ts->decoder->payload = ts->msg;
-                        ts->decoder->elem_count = state.elem_count;
+                        decoder->payload = ts->msg;
+                        decoder->elem_count = state.elem_count;
                         *consumed = successfully_parsed_bytes;
                         *last_id = id;
                         return (1); /* ask for more data */
@@ -882,17 +901,17 @@ int thingset_bin_import_data_progressively(struct thingset_context* ts, uint8_t 
             }
             else {
                 /* did not find this object in lookup or was not writable */
-                if (zcbor_any_skip(ts->decoder, NULL)) {
-                    state = *ts->decoder;
-                    successfully_parsed_bytes = ts->decoder->payload - ts->msg;
+                if (zcbor_any_skip(decoder, NULL)) {
+                    state = *decoder;
+                    successfully_parsed_bytes = decoder->payload - ts->msg;
                 }
                 else {
                     /* reincrement element count because ID will be parsed again */
-                    ts->decoder->elem_count = state.elem_count;
+                    decoder->elem_count = state.elem_count;
                 }
             }
 
-            state = *ts->decoder;
+            state = *decoder;
             *last_id = id;
         }
     }
@@ -905,29 +924,29 @@ int thingset_bin_import_data_progressively(struct thingset_context* ts, uint8_t 
         return (-THINGSET_ERR_UNSUPPORTED_FORMAT);
     }
 
-    bool finished = (ts->decoder->payload == ts->decoder->payload_end);
-    ts->decoder->payload = ts->msg; /* reset decoder position */
+    bool finished = (decoder->payload == decoder->payload_end);
+    decoder->payload = ts->msg; /* reset decoder position */
 
     return (finished ? 0 : 1);
 }
 
 int thingset_bin_import_data(struct thingset_context* ts, uint8_t auth_flags,
                              enum thingset_data_format format) {
-    int err;
+    int ret;
 
-    err = ts->api->deserialize_map_start(ts);
-    if (err != 0) {
-        return (err);
+    ret = ts->api->deserialize_map_start(ts);
+    if (ret != 0) {
+        return (ret);
     }
 
     uint32_t id;
     while (zcbor_uint32_decode(ts->decoder, &id)) {
         if (id <= UINT16_MAX) {
-            const struct thingset_data_object* object = thingset_get_object_by_id(ts, id);
+            const struct thingset_data_object* object = thingset_get_object_by_id(ts, (uint16_t)id);
             if (object != NULL) {
                 if ((object->access & THINGSET_WRITE_MASK & auth_flags) != 0) {
-                    err = ts->api->deserialize_value(ts, object, false);
-                    if (err == 0) {
+                    ret = ts->api->deserialize_value(ts, object, false);
+                    if (ret == 0) {
                         continue;
                     }
                 }

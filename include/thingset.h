@@ -83,9 +83,8 @@ extern "C" {
 /* Internal status codes */
 #define THINGSET_ERR_DESERIALIZATION_FINISHED 0xF0 /**< Internal indication: Parsing finished. */
 
-#define THINGSET_ERROR(code) (code >= 0xA0) /**< Check if provided code indicates an error. */
-#define THINGSET_SUCCESS(code) \
-    (code >= 0x80 && code < 0xA0) /**< Check if provided code indicates success. */
+#define THINGSET_ERROR(code)   (code >= 0xA0)                /**< Check if provided code indicates an error. */
+#define THINGSET_SUCCESS(code) (code >= 0x80 && code < 0xA0) /**< Check if provided code indicates success. */
 
 /* Reserved data object IDs */
 #define THINGSET_ID_ROOT        0x00 /**< Root object for a node (empty path) */
@@ -111,9 +110,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_BOOL(parent_id, id, name, bool_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .b = bool_ptr }, THINGSET_TYPE_BOOL, 0, access, subsets \
-    }
+    {parent_id, id, name, {.b = bool_ptr}, THINGSET_TYPE_BOOL, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `uint8_t` variable via ThingSet.
@@ -126,9 +123,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_UINT8(parent_id, id, name, uint8_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .u8 = uint8_ptr }, THINGSET_TYPE_U8, 0, access, subsets \
-    }
+    {parent_id, id, name, {.u8 = uint8_ptr}, THINGSET_TYPE_U8, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `int8_t` variable via ThingSet.
@@ -141,9 +136,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_INT8(parent_id, id, name, int8_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .i8 = int8_ptr }, THINGSET_TYPE_I8, 0, access, subsets \
-    }
+    {parent_id, id, name, {.i8 = int8_ptr}, THINGSET_TYPE_I8, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `uint16_t` variable via ThingSet.
@@ -156,9 +149,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_UINT16(parent_id, id, name, uint16_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .u16 = uint16_ptr }, THINGSET_TYPE_U16, 0, access, subsets \
-    }
+    {parent_id, id, name, {.u16 = uint16_ptr}, THINGSET_TYPE_U16, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `int16_t` variable via ThingSet.
@@ -171,9 +162,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_INT16(parent_id, id, name, int16_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .i16 = int16_ptr }, THINGSET_TYPE_I16, 0, access, subsets \
-    }
+    {parent_id, id, name, {.i16 = int16_ptr}, THINGSET_TYPE_I16, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `uint32_t` variable via ThingSet.
@@ -186,9 +175,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_UINT32(parent_id, id, name, uint32_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .u32 = uint32_ptr }, THINGSET_TYPE_U32, 0, access, subsets \
-    }
+    {parent_id, id, name, {.u32 = uint32_ptr}, THINGSET_TYPE_U32, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `int32_t` variable via ThingSet.
@@ -201,9 +188,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_INT32(parent_id, id, name, int32_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .i32 = int32_ptr }, THINGSET_TYPE_I32, 0, access, subsets \
-    }
+    {parent_id, id, name, {.i32 = int32_ptr}, THINGSET_TYPE_I32, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `uint64_t` variable via ThingSet.
@@ -216,9 +201,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_UINT64(parent_id, id, name, uint64_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .u64 = uint64_ptr }, THINGSET_TYPE_U64, 0, access, subsets \
-    }
+    {parent_id, id, name, {.u64 = uint64_ptr}, THINGSET_TYPE_U64, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `int64_t` variable via ThingSet.
@@ -231,9 +214,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_INT64(parent_id, id, name, int64_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .i64 = int64_ptr }, THINGSET_TYPE_I64, 0, access, subsets \
-    }
+    {parent_id, id, name, {.i64 = int64_ptr}, THINGSET_TYPE_I64, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose `float` variable via ThingSet.
@@ -247,9 +228,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_FLOAT(parent_id, id, name, float_ptr, decimals, access, subsets) \
-    { \
-        parent_id, id, name, { .f32 = float_ptr }, THINGSET_TYPE_F32, decimals, access, subsets \
-    }
+    {parent_id, id, name, {.f32 = float_ptr}, THINGSET_TYPE_F32, decimals, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose decimal fraction variable via ThingSet.
@@ -267,10 +246,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_DECFRAC(parent_id, id, name, mantissa_ptr, decimals, access, subsets) \
-    { \
-        parent_id, id, name, { .i32 = mantissa_ptr }, THINGSET_TYPE_DECFRAC, decimals, access, \
-            subsets \
-    }
+    {parent_id, id, name, {.i32 = mantissa_ptr}, THINGSET_TYPE_DECFRAC, decimals, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose a null-terminated character string buffer via
@@ -285,9 +261,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_STRING(parent_id, id, name, char_ptr, buf_size, access, subsets) \
-    { \
-        parent_id, id, name, { .str = char_ptr }, THINGSET_TYPE_STRING, buf_size, access, subsets \
-    }
+    {parent_id, id, name, {.str = char_ptr}, THINGSET_TYPE_STRING, buf_size, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose a byte buffer containing arbitrary binary data
@@ -303,9 +277,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_BYTES(parent_id, id, name, bytes_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .bytes = bytes_ptr }, THINGSET_TYPE_BYTES, 0, access, subsets \
-    }
+    {parent_id, id, name, {.bytes = bytes_ptr}, THINGSET_TYPE_BYTES, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose a function with `void` return value as an
@@ -321,9 +293,7 @@ extern "C" {
  * @param access Flags to define read/write access for this data object
  */
 #define THINGSET_FN_VOID(parent_id, id, name, void_fn_ptr, access) \
-    { \
-        parent_id, id, name, { .void_fn = (void (*)(void))void_fn_ptr }, THINGSET_TYPE_FN_VOID, 0, access, 0 \
-    }
+    {parent_id, id, name, {.void_fn = (void (*)(void))void_fn_ptr}, THINGSET_TYPE_FN_VOID, 0, access, 0}
 
 /**
  * Initialize struct thingset_data_object to expose a function with `int32_t` return value as an
@@ -339,9 +309,7 @@ extern "C" {
  * @param access Flags to define read/write access for this data object
  */
 #define THINGSET_FN_INT32(parent_id, id, name, int32_fn_ptr, access) \
-    { \
-        parent_id, id, name, { .i32_fn = (int32_t (*)(void))int32_fn_ptr }, THINGSET_TYPE_FN_I32, 0, access, 0 \
-    }
+    {parent_id, id, name, {.i32_fn = (int32_t (*)(void))int32_fn_ptr}, THINGSET_TYPE_FN_I32, 0, access, 0}
 
 /**
  * Initialize struct thingset_data_object to expose an array of simple values via ThingSet.
@@ -354,9 +322,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_ITEM_ARRAY(parent_id, id, name, array_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .array = array_ptr }, THINGSET_TYPE_ARRAY, 0, access, subsets \
-    }
+    {parent_id, id, name, {.array = array_ptr}, THINGSET_TYPE_ARRAY, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose records of similar data via ThingSet.
@@ -369,9 +335,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_RECORDS(parent_id, id, name, records_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .records = records_ptr }, THINGSET_TYPE_RECORDS, 0, access, subsets \
-    }
+    {parent_id, id, name, {.records = records_ptr}, THINGSET_TYPE_RECORDS, 0, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose dynamic records of similar data via ThingSet.
@@ -389,10 +353,7 @@ extern "C" {
  * @param subsets Subset(s) this data object belongs to
  */
 #define THINGSET_DYN_RECORDS(parent_id, id, name, records_ptr, access, subsets) \
-    { \
-        parent_id, id, name, { .records = records_ptr }, THINGSET_TYPE_RECORDS, \
-            THINGSET_DETAIL_DYN_RECORDS, access, subsets \
-    }
+    {parent_id, id, name, {.records = records_ptr}, THINGSET_TYPE_RECORDS, THINGSET_DETAIL_DYN_RECORDS, access, subsets}
 
 /**
  * Initialize struct thingset_data_object to expose a subset item via ThingSet.
@@ -404,9 +365,7 @@ extern "C" {
  * @param access Flags to define read/write access for this data object
  */
 #define THINGSET_SUBSET(parent_id, id, name, subset_flag, access) \
-    { \
-        parent_id, id, name, { .subset = subset_flag }, THINGSET_TYPE_SUBSET, 0, access, 0 \
-    }
+    {parent_id, id, name, {.subset = subset_flag}, THINGSET_TYPE_SUBSET, 0, access, 0}
 
 /**
  * Initialize struct thingset_data_object to group hierarchical data via ThingSet.
@@ -417,10 +376,7 @@ extern "C" {
  * @param update_callback Pointer to a function to be called before/after read/write operations.
  */
 #define THINGSET_GROUP(parent_id, id, name, update_callback) \
-    { \
-        parent_id, id, name, { .group_callback = update_callback }, THINGSET_TYPE_GROUP, 0, \
-            THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.group_callback = update_callback}, THINGSET_TYPE_GROUP, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `bool` record item.
@@ -432,10 +388,7 @@ extern "C" {
  * @param struct_member Struct member of type `bool` used for this item
  */
 #define THINGSET_RECORD_ITEM_BOOL(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_BOOL, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_BOOL, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `uint64_t` record item.
@@ -447,10 +400,7 @@ extern "C" {
  * @param struct_member Struct member of type `uint64_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_UINT64(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_U64, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_U64, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `int64_t` record item.
@@ -462,10 +412,7 @@ extern "C" {
  * @param struct_member Struct member of type `int64_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_INT64(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_I64, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_I64, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `uint32_t` record item.
@@ -477,10 +424,7 @@ extern "C" {
  * @param struct_member Struct member of type `uint32_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_UINT32(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_U32, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_U32, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `int32_t` record item.
@@ -492,10 +436,7 @@ extern "C" {
  * @param struct_member Struct member of type `int32_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_INT32(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_I32, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_I32, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `uint16_t` record item.
@@ -507,10 +448,7 @@ extern "C" {
  * @param struct_member Struct member of type `uint16_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_UINT16(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_U16, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_U16, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `int16_t` record item.
@@ -522,10 +460,7 @@ extern "C" {
  * @param struct_member Struct member of type `int16_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_INT16(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_I16, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_I16, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `uint8_t` record item.
@@ -537,10 +472,7 @@ extern "C" {
  * @param struct_member Struct member of type `uint8_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_UINT8(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, THINGSET_TYPE_U8, \
-            0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_U8, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `int8_t` record item.
@@ -552,10 +484,7 @@ extern "C" {
  * @param struct_member Struct member of type `int8_t` used for this item
  */
 #define THINGSET_RECORD_ITEM_INT8(parent_id, id, name, struct_type, struct_member) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, THINGSET_TYPE_I8, \
-            0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_I8, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose `float` record item.
@@ -568,10 +497,8 @@ extern "C" {
  * @param decimals Number of decimal digits to be serialized in text mode
  */
 #define THINGSET_RECORD_ITEM_FLOAT(parent_id, id, name, struct_type, struct_member, decimals) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_F32, decimals, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_F32, decimals, \
+     THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose decimal fraction record item.
@@ -584,10 +511,8 @@ extern "C" {
  * @param decimals Number of decimal digits to be serialized in text mode
  */
 #define THINGSET_RECORD_ITEM_DECFRAC(parent_id, id, name, struct_type, struct_member, decimals) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_DECFRAC, decimals, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_DECFRAC, decimals, \
+     THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose a null-terminated character string buffer
@@ -601,10 +526,8 @@ extern "C" {
  * @param buf_size Maximum length of the buffer including the null-termination character
  */
 #define THINGSET_RECORD_ITEM_STRING(parent_id, id, name, struct_type, struct_member, buf_size) \
-    { \
-        parent_id, id, name, { .offset = offsetof(struct_type, struct_member) }, \
-            THINGSET_TYPE_STRING, buf_size, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.offset = offsetof(struct_type, struct_member)}, THINGSET_TYPE_STRING, buf_size, \
+     THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose an array record item.
@@ -615,9 +538,7 @@ extern "C" {
  * @param array_ptr Pointer to the struct thingset_array object
  */
 #define THINGSET_RECORD_ITEM_ARRAY(parent_id, id, name, array_ptr) \
-    { \
-        parent_id, id, name, { .array = array_ptr }, THINGSET_TYPE_ARRAY, 0, THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.array = array_ptr}, THINGSET_TYPE_ARRAY, 0, THINGSET_READ_MASK}
 
 /**
  * Initialize struct thingset_data_object to expose a nested record item.
@@ -628,10 +549,7 @@ extern "C" {
  * @param records_ptr Pointer to the struct thingset_records object
  */
 #define THINGSET_RECORD_ITEM_RECORD(parent_id, id, name, records_ptr) \
-    { \
-        parent_id, id, name, { .records = records_ptr }, THINGSET_TYPE_RECORDS, 0, \
-            THINGSET_READ_MASK \
-    }
+    {parent_id, id, name, {.records = records_ptr}, THINGSET_TYPE_RECORDS, 0, THINGSET_READ_MASK}
 
 /*
  * Macros for defining data objects using Zephyr iterable sections.
@@ -936,7 +854,7 @@ extern "C" {
  * @param used_bytes Currently used elements in the buffer
  */
 #define THINGSET_DEFINE_BYTES(var_name, buffer, used_bytes) \
-    struct thingset_bytes var_name = { buffer, sizeof(buffer), used_bytes };
+    struct thingset_bytes var_name = {buffer, sizeof(buffer), used_bytes};
 
 /**
  * Define a struct thingset_array to expose `bool` arrays with #THINGSET_ITEM_ARRAY
@@ -947,7 +865,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_BOOL_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .b = array }, THINGSET_TYPE_BOOL, 0, _ARRAY_SIZE(array), used_elements, \
+        {.b = array}, THINGSET_TYPE_BOOL, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -959,7 +877,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_UINT8_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .u8 = array }, THINGSET_TYPE_U8, 0, _ARRAY_SIZE(array), used_elements, \
+        {.u8 = array}, THINGSET_TYPE_U8, 0, _ARRAY_SIZE(array), used_elements,  \
     };
 
 /**
@@ -971,7 +889,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_INT8_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .i8 = array }, THINGSET_TYPE_I8, 0, _ARRAY_SIZE(array), used_elements, \
+        {.i8 = array}, THINGSET_TYPE_I8, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -983,7 +901,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_UINT16_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .u16 = array }, THINGSET_TYPE_U16, 0, _ARRAY_SIZE(array), used_elements, \
+        {.u16 = array}, THINGSET_TYPE_U16, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -995,7 +913,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_INT16_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .i16 = array }, THINGSET_TYPE_I16, 0, _ARRAY_SIZE(array), used_elements, \
+        {.i16 = array}, THINGSET_TYPE_I16, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1007,7 +925,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_UINT32_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .u32 = array }, THINGSET_TYPE_U32, 0, _ARRAY_SIZE(array), used_elements, \
+        {.u32 = array}, THINGSET_TYPE_U32, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1019,7 +937,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_INT32_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .i32 = array }, THINGSET_TYPE_I32, 0, _ARRAY_SIZE(array), used_elements, \
+        {.i32 = array}, THINGSET_TYPE_I32, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1031,7 +949,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_UINT64_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .u64 = array }, THINGSET_TYPE_U64, 0, _ARRAY_SIZE(array), used_elements, \
+        {.u64 = array}, THINGSET_TYPE_U64, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1043,7 +961,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_INT64_ARRAY(var_name, array, used_elements) \
     struct thingset_array var_name = { \
-        { .i64 = array }, THINGSET_TYPE_I64, 0, _ARRAY_SIZE(array), used_elements, \
+        {.i64 = array}, THINGSET_TYPE_I64, 0, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1056,7 +974,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_FLOAT_ARRAY(var_name, decimals, array, used_elements) \
     struct thingset_array var_name = { \
-        { .f32 = array }, THINGSET_TYPE_F32, decimals, _ARRAY_SIZE(array), used_elements, \
+        {.f32 = array}, THINGSET_TYPE_F32, decimals, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1069,7 +987,7 @@ extern "C" {
  */
 #define THINGSET_DEFINE_DECFRAC_ARRAY(var_name, decimals, array, used_elements) \
     struct thingset_array var_name = { \
-        { .decfrac = array }, THINGSET_TYPE_DECFRAC, decimals, _ARRAY_SIZE(array), used_elements, \
+        {.decfrac = array}, THINGSET_TYPE_DECFRAC, decimals, _ARRAY_SIZE(array), used_elements, \
     };
 
 /**
@@ -1080,12 +998,12 @@ extern "C" {
  * @param struct_member Struct member of type `bool` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_BOOL_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_BOOL, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_BOOL,                                     \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1096,12 +1014,12 @@ extern "C" {
  * @param struct_member Struct member of type `uint8_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_UINT8_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_U8, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_U8,                                       \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1112,12 +1030,12 @@ extern "C" {
  * @param struct_member Struct member of type `int8_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_INT8_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_I8, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_I8,                                       \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1128,12 +1046,12 @@ extern "C" {
  * @param struct_member Struct member of type `uint16_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_UINT16_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_U16, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_U16,                                      \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1144,12 +1062,12 @@ extern "C" {
  * @param struct_member Struct member of type `int16_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_INT16_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_I16, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_I16,                                      \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1160,12 +1078,12 @@ extern "C" {
  * @param struct_member Struct member of type `uint32_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_UINT32_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_U32, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_U32,                                      \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1176,12 +1094,12 @@ extern "C" {
  * @param struct_member Struct member of type `int32_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_INT32_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_I32, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_I32,                                      \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1192,12 +1110,12 @@ extern "C" {
  * @param struct_member Struct member of type `uint64_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_UINT64_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_U64, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_U64,                                      \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1208,12 +1126,12 @@ extern "C" {
  * @param struct_member Struct member of type `int64_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_INT64_ARRAY(var_name, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_I64, \
-        0, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_I64,                                      \
+        0,                                                      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1225,12 +1143,12 @@ extern "C" {
  * @param struct_member Struct member of type `float` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_FLOAT_ARRAY(var_name, decimals, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_F32, \
-        decimals, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_F32,                                      \
+        decimals,                                               \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1242,12 +1160,12 @@ extern "C" {
  * @param struct_member Struct member of type `int32_t` array used for this item
  */
 #define THINGSET_DEFINE_RECORD_DECFRAC_ARRAY(var_name, decfrac, struct_type, struct_member) \
-    struct thingset_array var_name = { \
-        { .offset = offsetof(struct_type, struct_member) }, \
-        THINGSET_TYPE_F32, \
-        decimals, \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-        _ARRAY_SIZE(((struct_type *)0)->struct_member), \
+    struct thingset_array var_name = {                          \
+        {.offset = offsetof(struct_type, struct_member)},       \
+        THINGSET_TYPE_F32,                                      \
+        decimals,                                               \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
     };
 
 /**
@@ -1258,12 +1176,13 @@ extern "C" {
  * @param struct_member Struct member used for this item
  */
 #define THINGSET_DEFINE_RECORD_RECORDS(var_name, struct_type, struct_member) \
-    struct thingset_records var_name = { (void *)offsetof(struct_type, struct_member), \
-                                         sizeof(__typeof__(((struct_type *)0)->struct_member)) \
-                                             / _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-                                         _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-                                         _ARRAY_SIZE(((struct_type *)0)->struct_member), \
-                                         THINGSET_NO_CALLBACK };
+    struct thingset_records var_name = {                        \
+        (void*)offsetof(struct_type, struct_member),            \
+        sizeof(__typeof__(((struct_type*)0)->struct_member)) /  \
+            _ARRAY_SIZE(((struct_type*)0)->struct_member),      \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        _ARRAY_SIZE(((struct_type*)0)->struct_member),          \
+        THINGSET_NO_CALLBACK};
 
 /**
  * Define a struct thingset_records to be used with #THINGSET_RECORDS
@@ -1273,9 +1192,10 @@ extern "C" {
  * @param used_records Number of currently used records
  */
 #define THINGSET_DEFINE_RECORDS(var_name, records, used_records) \
-    struct thingset_records var_name = { records, sizeof(__typeof__(*records)), \
-                                         ARRAY_SIZE(records), used_records, \
-                                         THINGSET_NO_CALLBACK };
+    struct thingset_records var_name = {                        \
+        records, sizeof(__typeof__(*records)),                  \
+        ARRAY_SIZE(records), used_records,                      \
+        THINGSET_NO_CALLBACK};
 
 /**
  * Define a struct thingset_records to be used with #THINGSET_DYN_RECORDS
@@ -1286,8 +1206,9 @@ extern "C" {
  * @param callback Pointer to a function to be called before/after read/write operations.
  */
 #define THINGSET_DEFINE_DYN_RECORDS(var_name, record, available_records, callback) \
-    struct thingset_records var_name = { record, sizeof(__typeof__(*record)), 1, \
-                                         available_records, callback };
+    struct thingset_records var_name = {                        \
+        record, sizeof(__typeof__(*record)), 1,                 \
+        available_records, callback};
 
 /*
  * Defines to make data object definitions more explicit
@@ -1357,8 +1278,7 @@ typedef uint16_t thingset_object_id_t;
  * desired actions, e.g. update data from ADC before it is read/serialized or write data to an
  * EEPROM after it was written/deserialized.
  */
-enum thingset_callback_reason
-{
+enum thingset_callback_reason {
     THINGSET_CALLBACK_PRE_READ,   /**< Function was called before serializing data of the group */
     THINGSET_CALLBACK_POST_READ,  /**< Function was called after serializing data of the group */
     THINGSET_CALLBACK_PRE_WRITE,  /**< Function was called before deserializing data of the group */
@@ -1376,8 +1296,7 @@ typedef void (*thingset_records_callback_t)(enum thingset_callback_reason cb_rea
 /**
  * Internal C data types (used together with union thingset_data_pointer)
  */
-enum thingset_type
-{
+enum thingset_type {
     THINGSET_TYPE_BOOL,    /**< bool */
     THINGSET_TYPE_U8,      /**< uint8_t */
     THINGSET_TYPE_I8,      /**< int8_t */
@@ -1402,11 +1321,12 @@ enum thingset_type
 /**
  * Helper function to determine the size of above ThingSet types in bytes
  */
-static inline size_t thingset_type_size(uint8_t type)
-{
-    uint8_t sizes[] = { sizeof(bool),    sizeof(uint8_t),  sizeof(int8_t),  sizeof(uint16_t),
-                        sizeof(int16_t), sizeof(uint32_t), sizeof(int32_t), sizeof(uint64_t),
-                        sizeof(int64_t), sizeof(float),    sizeof(int32_t) };
+static inline size_t thingset_type_size(uint8_t type) {
+    uint8_t sizes[] = {
+        sizeof(bool),    sizeof(uint8_t),  sizeof(int8_t),  sizeof(uint16_t),
+        sizeof(int16_t), sizeof(uint32_t), sizeof(int32_t), sizeof(uint64_t),
+        sizeof(int64_t), sizeof(float),    sizeof(int32_t)
+    };
     return type < sizeof(sizes) ? sizes[type] : 0;
 }
 
@@ -1414,25 +1334,25 @@ static inline size_t thingset_type_size(uint8_t type)
  * Union for type-checking of provided data item variable pointers through the macros.
  */
 union thingset_data_pointer {
-    bool *b;                          /**< Pointer to bool variable */
-    uint8_t *u8;                      /**< Pointer to uint8_t variable */
-    int8_t *i8;                       /**< Pointer to int8_t variable */
-    uint16_t *u16;                    /**< Pointer to uint16_t variable */
-    int16_t *i16;                     /**< Pointer to int16_t variable */
-    uint32_t *u32;                    /**< Pointer to uint32_t variable */
-    int32_t *i32;                     /**< Pointer to int32_t variable */
-    uint64_t *u64;                    /**< Pointer to uint64_t variable */
-    int64_t *i64;                     /**< Pointer to int64_t variable */
-    float *f32;                       /**< Pointer to float variable */
-    int32_t *decfrac;                 /**< Pointer to decimal fraction mantissa */
-    char *str;                        /**< Pointer to string buffer */
-    struct thingset_bytes *bytes;     /**< Pointer to thingset_bytes struct */
-    struct thingset_array *array;     /**< Pointer to thingset_array struct */
-    struct thingset_records *records; /**< Pointer to thingset_records struct */
-    size_t offset;                    /**< Offset for record elements */
-    uint32_t subset;                  /**< Subset flag(s) */
-    void (*void_fn)();                /**< Pointer to function with void return value */
-    int32_t (*i32_fn)();              /**< Pointer to function with int32_t return value */
+    bool* b;                                /**< Pointer to bool variable */
+    uint8_t* u8;                            /**< Pointer to uint8_t variable */
+    int8_t* i8;                             /**< Pointer to int8_t variable */
+    uint16_t* u16;                          /**< Pointer to uint16_t variable */
+    int16_t* i16;                           /**< Pointer to int16_t variable */
+    uint32_t* u32;                          /**< Pointer to uint32_t variable */
+    int32_t* i32;                           /**< Pointer to int32_t variable */
+    uint64_t* u64;                          /**< Pointer to uint64_t variable */
+    int64_t* i64;                           /**< Pointer to int64_t variable */
+    float* f32;                             /**< Pointer to float variable */
+    int32_t* decfrac;                       /**< Pointer to decimal fraction mantissa */
+    char* str;                              /**< Pointer to string buffer */
+    struct thingset_bytes* bytes;           /**< Pointer to thingset_bytes struct */
+    struct thingset_array* array;           /**< Pointer to thingset_array struct */
+    struct thingset_records* records;       /**< Pointer to thingset_records struct */
+    size_t offset;                          /**< Offset for record elements */
+    uint32_t subset;                        /**< Subset flag(s) */
+    void (*void_fn)();                      /**< Pointer to function with void return value */
+    int32_t (*i32_fn)();                    /**< Pointer to function with int32_t return value */
     /** Pointer to group callback function */
     thingset_group_callback_t group_callback;
 };
@@ -1442,48 +1362,44 @@ union thingset_data_pointer {
 /**
  * Enum to define ThingSet data format (used by export/import and report functions).
  */
-enum thingset_data_format
-{
-    THINGSET_TXT_NAMES_VALUES, /**< Text names and values (JSON) */
-    THINGSET_TXT_NAMES_ONLY,   /**< Text names only (JSON) */
-    THINGSET_TXT_VALUES_ONLY,  /**< Text values only (JSON) */
-    THINGSET_BIN_IDS_VALUES,   /**< Binary IDs and values (CBOR) */
-    THINGSET_BIN_NAMES_VALUES, /**< Binary names and values (CBOR) */
-    THINGSET_BIN_IDS_ONLY,     /**< Binary IDs only (CBOR) */
-    THINGSET_BIN_VALUES_ONLY,  /**< Binary values only (CBOR) */
+enum thingset_data_format {
+    THINGSET_TXT_NAMES_VALUES,  /**< Text names and values (JSON) */
+    THINGSET_TXT_NAMES_ONLY,    /**< Text names only (JSON) */
+    THINGSET_TXT_VALUES_ONLY,   /**< Text values only (JSON) */
+    THINGSET_BIN_IDS_VALUES,    /**< Binary IDs and values (CBOR) */
+    THINGSET_BIN_NAMES_VALUES,  /**< Binary names and values (CBOR) */
+    THINGSET_BIN_IDS_ONLY,      /**< Binary IDs only (CBOR) */
+    THINGSET_BIN_VALUES_ONLY,   /**< Binary values only (CBOR) */
 };
 
 /**
  * Data structure to specify a binary data buffer
  */
-struct thingset_bytes
-{
-    uint8_t *bytes;           /**< Pointer to the bytes buffer */
-    const uint16_t max_bytes; /**< Maximum number of bytes in the buffer */
-    uint16_t num_bytes;       /**< Actual number of bytes in the buffer */
+struct thingset_bytes {
+    uint8_t* bytes;             /**< Pointer to the bytes buffer */
+    uint16_t const max_bytes;   /**< Maximum number of bytes in the buffer */
+    uint16_t num_bytes;         /**< Actual number of bytes in the buffer */
 };
 
 /**
  * Data structure to specify an array data object
  */
-struct thingset_array
-{
+struct thingset_array {
     const union thingset_data_pointer elements; /**< Pointer to the first element of the array */
-    const enum thingset_type element_type; /**< Type of the array elements (enum thingset_type) */
-    const int16_t decimals;                /**< See detail in struct thingset_data_object */
-    const uint16_t max_elements;           /**< Maximum number of elements in the array */
-    uint16_t num_elements;                 /**< Actual number of elements in the array */
+    const enum thingset_type element_type;  /**< Type of the array elements (enum thingset_type) */
+    int16_t const decimals;                 /**< See detail in struct thingset_data_object */
+    uint16_t const max_elements;            /**< Maximum number of elements in the array */
+    uint16_t num_elements;                  /**< Actual number of elements in the array */
 };
 
 /**
  * Data structure to specify records of an arbitrary struct
  */
-struct thingset_records
-{
-    const void *records;        /**< Pointer to the first record */
-    const size_t record_size;   /**< Size of one record in bytes */
-    const uint16_t max_records; /**< Maximum number of records in the array */
-    uint16_t num_records;       /**< Actual number of records in the array */
+struct thingset_records {
+    void const* records;                    /**< Pointer to the first record */
+    size_t const record_size;               /**< Size of one record in bytes */
+    uint16_t const max_records;             /**< Maximum number of records in the array */
+    uint16_t num_records;                   /**< Actual number of records in the array */
     thingset_records_callback_t callback;
 };
 
@@ -1495,17 +1411,17 @@ struct thingset_data_object {
     /**
      * ID of parent object
      */
-    const thingset_object_id_t parent_id;
+    thingset_object_id_t const parent_id;
 
     /**
      * Data object ID
      */
-    const thingset_object_id_t id;
+    thingset_object_id_t const id;
 
     /**
      * Data object name
      */
-    const char *name;
+    char const* name;
 
     /**
      * Pointer to the variable containing the data. The variable type must match the type as
@@ -1533,12 +1449,12 @@ struct thingset_data_object {
      *
      * - STRING: Size of the internal buffer in bytes.
      */
-    const int32_t detail : 12;
+    int32_t const detail : 12;
 
     /**
      * Flags to define read/write access
      */
-    const uint32_t access : 8;
+    uint32_t const access : 8;
 
     /**
      * Flags to assign data item to different data item subsets (e.g. for reports)
@@ -1557,17 +1473,17 @@ struct thingset_data_object {
     /**
      * ID of parent object
      */
-    const thingset_object_id_t parent_id;
+    thingset_object_id_t const parent_id;
 
     /**
      * Data object ID
      */
-    const thingset_object_id_t id;
+    thingset_object_id_t const id;
 
     /**
      * Data object name
      */
-    const char *name;
+    char const* name;
 
     /**
      * Pointer to the variable containing the data. The variable type must match the type as
@@ -1595,12 +1511,12 @@ struct thingset_data_object {
      *
      * - STRING: Size of the internal buffer in bytes.
      */
-    const int32_t detail;
+    int32_t const detail;
 
     /**
      * Flags to define read/write access
      */
-    const uint32_t access;
+    uint32_t const access;
 
     /**
      * Flags to assign data item to different data item subsets (e.g. for reports)
@@ -1619,12 +1535,13 @@ struct thingset_data_object {
 /**
  * Data to describe the endpoint parsed from a ThingSet request
  */
-struct thingset_endpoint
-{
+struct thingset_endpoint {
     /** Pointer to the data object in memory (must never be NULL) */
-    struct thingset_data_object *object;
+    struct thingset_data_object* object;
+
     /** Index number or THINGSET_ENDPOINT_INDEX_NONE or THINGSET_ENDPOINT_INDEX_NEW */
     int32_t index;
+
     /** Use names or IDs (relevant for binary mode) */
     bool use_ids;
 };
@@ -1637,19 +1554,18 @@ struct thingset_api;
  *
  * Stores and handles all data objects exposed to different communication interfaces.
  */
-struct thingset_context
-{
+struct thingset_context {
     /**
      * Array of objects database provided during initialization
      */
-    struct thingset_data_object *data_objects;
+    struct thingset_data_object* data_objects;
 
-#ifdef CONFIG_THINGSET_OBJECT_LOOKUP_MAP
+    #ifdef CONFIG_THINGSET_OBJECT_LOOKUP_MAP
     /**
      * Array of linked lists: map for object ID lookup
      */
     sys_slist_t data_objects_lookup[CONFIG_THINGSET_OBJECT_LOOKUP_BUCKETS];
-#endif
+    #endif
 
     /**
      * Number of objects in the data_objects array
@@ -1665,7 +1581,7 @@ struct thingset_context
     /**
      * Pointer to the incoming message buffer (request or desire, provided by process function)
      */
-    const uint8_t *msg;
+    uint8_t const* msg;
 
     /**
      * Length of the incoming message
@@ -1680,12 +1596,12 @@ struct thingset_context
     /**
      * Pointer to the start of the payload in the message buffer
      */
-    const uint8_t *msg_payload;
+    uint8_t const* msg_payload;
 
     /**
      * Pointer to the response buffer (provided by process function)
      */
-    uint8_t *rsp;
+    uint8_t* rsp;
 
     /**
      * Size of response buffer (i.e. maximum length)
@@ -1709,8 +1625,7 @@ struct thingset_context
      */
     union {
         /* Text mode */
-        struct
-        {
+        struct {
             /** JSON tokens in msg_payload parsed by JSMN */
             jsmntok_t tokens[CONFIG_THINGSET_NUM_JSON_TOKENS];
 
@@ -1720,9 +1635,9 @@ struct thingset_context
             /** Current position of the parsing process */
             size_t tok_pos;
         };
+
         /* Binary mode */
-        struct
-        {
+        struct {
             /** CBOR encoder states for binary mode */
             zcbor_state_t encoder[CONFIG_THINGSET_BINARY_MAX_DEPTH];
 
@@ -1760,7 +1675,7 @@ struct thingset_context
  * @param objects Pointer to array containing the ThingSet object database
  * @param num_objects Number of elements in that array
  */
-void thingset_init(struct thingset_context *ts, struct thingset_data_object *objects,
+void thingset_init(struct thingset_context* ts, struct thingset_data_object* objects,
                    size_t num_objects);
 
 /**
@@ -1771,7 +1686,7 @@ void thingset_init(struct thingset_context *ts, struct thingset_data_object *obj
  *
  * @param ts Pointer to ThingSet context.
  */
-void thingset_init_global(struct thingset_context *ts);
+void thingset_init_global(struct thingset_context* ts);
 
 /**
  * Process ThingSet request or desire.
@@ -1791,8 +1706,8 @@ void thingset_init_global(struct thingset_context *ts);
  * @retval 0 If the message was empty or a desire was processed successfully (no response)
  * @retval err Negative ThingSet response code if a desire could not be processed successfully
  */
-int thingset_process_message(struct thingset_context *ts, const uint8_t *msg, size_t msg_len,
-                             uint8_t *rsp, size_t rsp_size);
+int thingset_process_message(struct thingset_context* ts, uint8_t const* msg, size_t msg_len,
+                             uint8_t* rsp, size_t rsp_size);
 
 /**
  * Retrieve data for given subset(s).
@@ -1811,7 +1726,7 @@ int thingset_process_message(struct thingset_context *ts, const uint8_t *msg, si
  *
  * @return Actual length of the data or negative ThingSet response code in case of error.
  */
-int thingset_export_subsets(struct thingset_context *ts, uint8_t *buf, size_t buf_size,
+int thingset_export_subsets(struct thingset_context* ts, uint8_t* buf, size_t buf_size,
                             uint16_t subsets, enum thingset_data_format format);
 
 /**
@@ -1830,10 +1745,10 @@ int thingset_export_subsets(struct thingset_context *ts, uint8_t *buf, size_t bu
  *
  * @returns 1 if there are more objects to export, 0 when complete or negative if an error.
  */
-int thingset_export_subsets_progressively(struct thingset_context *ts, uint8_t *buf,
+int thingset_export_subsets_progressively(struct thingset_context* ts, uint8_t* buf,
                                           size_t buf_size, uint16_t subsets,
-                                          enum thingset_data_format format, unsigned int *index,
-                                          size_t *len);
+                                          enum thingset_data_format format, unsigned int* index,
+                                          size_t* len);
 
 /**
  * Export id, value and/or name of a single data item.
@@ -1852,8 +1767,8 @@ int thingset_export_subsets_progressively(struct thingset_context *ts, uint8_t *
  *
  * @return Actual length of the data or negative ThingSet response code in case of error.
  */
-int thingset_export_item(struct thingset_context *ts, uint8_t *buf, size_t buf_size,
-                         const struct thingset_data_object *obj, enum thingset_data_format format);
+int thingset_export_item(struct thingset_context* ts, uint8_t* buf, size_t buf_size,
+                         const struct thingset_data_object* obj, enum thingset_data_format format);
 
 /**
  * Iterate over all objects of given subset(s).
@@ -1864,8 +1779,8 @@ int thingset_export_item(struct thingset_context *ts, uint8_t *buf, size_t buf_s
  *
  * @returns Pointer to the next object found or NULL if end of data objects was reached
  */
-struct thingset_data_object *thingset_iterate_subsets(struct thingset_context *ts, uint16_t subset,
-                                                      struct thingset_data_object *start_obj);
+struct thingset_data_object* thingset_iterate_subsets(struct thingset_context* ts, uint16_t subset,
+                                                      struct thingset_data_object* start_obj);
 
 /**
  * Import data into data objects.
@@ -1883,7 +1798,7 @@ struct thingset_data_object *thingset_iterate_subsets(struct thingset_context *t
  *
  * @returns 0 for success or negative ThingSet response code in case of error
  */
-int thingset_import_data(struct thingset_context *ts, const uint8_t *data, size_t len,
+int thingset_import_data(struct thingset_context* ts, uint8_t const* data, size_t len,
                          uint8_t auth_flags, enum thingset_data_format format);
 
 /**
@@ -1902,7 +1817,7 @@ int thingset_import_data(struct thingset_context *ts, const uint8_t *data, size_
  *
  * @returns 0 for success or negative ThingSet response code in case of error
  */
-int thingset_import_report(struct thingset_context *ts, const uint8_t *data, size_t len,
+int thingset_import_report(struct thingset_context* ts, uint8_t const* data, size_t len,
                            uint8_t auth_flags, enum thingset_data_format format, uint16_t subset);
 
 /**
@@ -1927,9 +1842,9 @@ int thingset_import_report(struct thingset_context *ts, const uint8_t *data, siz
  * @returns 0 for success, 1 if more data is required or negative ThingSet response code
  * in case of error
  */
-int thingset_import_data_progressively(struct thingset_context *ts, const uint8_t *data, size_t len,
+int thingset_import_data_progressively(struct thingset_context* ts, uint8_t const* data, size_t len,
                                        enum thingset_data_format format, uint8_t auth_flags,
-                                       uint32_t *last_id, size_t *consumed);
+                                       uint32_t* last_id, size_t* consumed);
 
 /**
  * Completes the import of data from the buffer passed to @ref
@@ -1940,7 +1855,7 @@ int thingset_import_data_progressively(struct thingset_context *ts, const uint8_
  *
  * @returns 0 for success
  */
-int thingset_import_data_progressively_end(struct thingset_context *ts);
+int thingset_import_data_progressively_end(struct thingset_context* ts);
 
 /**
  * Import data into a record.
@@ -1955,7 +1870,7 @@ int thingset_import_data_progressively_end(struct thingset_context *ts);
  *
  * @returns 0 for success or negative ThingSet response code in case of error
  */
-int thingset_import_record(struct thingset_context *ts, uint8_t const *data, size_t len,
+int thingset_import_record(struct thingset_context* ts, uint8_t const* data, size_t len,
                            struct thingset_endpoint const* endpoint, enum thingset_data_format format);
 
 /**
@@ -1977,7 +1892,7 @@ int thingset_import_record(struct thingset_context *ts, uint8_t const *data, siz
  *
  * @return Actual length of the report or negative ThingSet response code in case of error
  */
-int thingset_report_path(struct thingset_context *ts, char *buf, size_t buf_size, const char *path,
+int thingset_report_path(struct thingset_context* ts, char* buf, size_t buf_size, char const* path,
                          enum thingset_data_format format);
 
 /**
@@ -1988,7 +1903,7 @@ int thingset_report_path(struct thingset_context *ts, char *buf, size_t buf_size
  * @param ts Pointer to ThingSet context.
  * @param flags Flags to define authentication level (1 = access allowed)
  */
-void thingset_set_authentication(struct thingset_context *ts, uint8_t flags);
+void thingset_set_authentication(struct thingset_context* ts, uint8_t flags);
 
 /**
  * Configure a callback for notification if data belonging to specified subset(s) was updated.
@@ -1997,7 +1912,7 @@ void thingset_set_authentication(struct thingset_context *ts, uint8_t flags);
  * @param subsets Flags to select which subset(s) of data items should be considered
  * @param update_cb Callback to be called after an update.
  */
-void thingset_set_update_callback(struct thingset_context *ts, const uint16_t subsets,
+void thingset_set_update_callback(struct thingset_context* ts, uint16_t const subsets,
                                   void (*update_cb)(void));
 
 /**
@@ -2010,8 +1925,8 @@ void thingset_set_update_callback(struct thingset_context *ts, const uint16_t su
  *
  * @return 0 if successful or negative ThingSet error code to be reported
  */
-int thingset_endpoint_by_path(struct thingset_context *ts, struct thingset_endpoint *endpoint,
-                              const char *path, size_t len);
+int thingset_endpoint_by_path(struct thingset_context* ts, struct thingset_endpoint* endpoint,
+                              char const* path, size_t len);
 
 /**
  * Get the endpoint from a provided ID.
@@ -2022,7 +1937,7 @@ int thingset_endpoint_by_path(struct thingset_context *ts, struct thingset_endpo
  *
  * @return 0 if successful or negative ThingSet error code to be reported
  */
-int thingset_endpoint_by_id(struct thingset_context *ts, struct thingset_endpoint *endpoint,
+int thingset_endpoint_by_id(struct thingset_context* ts, struct thingset_endpoint* endpoint,
                             uint16_t id);
 
 #ifdef __cplusplus
