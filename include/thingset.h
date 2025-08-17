@@ -1285,8 +1285,12 @@ enum thingset_callback_reason {
     THINGSET_CALLBACK_POST_WRITE, /**< Function was called after deserializing data of the group */
 };
 
+/** Forward declaration */
+struct thingset_data_object;
+
 /** Function to be called before/after read/write operations to groups. */
-typedef void (*thingset_group_callback_t)(enum thingset_callback_reason cb_reason);
+typedef void (*thingset_group_callback_t)(enum thingset_callback_reason cb_reason,
+                                          struct thingset_data_object const* object);
 
 /** Function to be called before/after read/write operations to records. */
 typedef void (*thingset_records_callback_t)(enum thingset_callback_reason cb_reason, int index);
