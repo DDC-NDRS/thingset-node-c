@@ -1289,11 +1289,12 @@ enum thingset_callback_reason {
 struct thingset_data_object;
 
 /** Function to be called before/after read/write operations to groups. */
-typedef void (*thingset_group_callback_t)(enum thingset_callback_reason cb_reason,
-                                          struct thingset_data_object const* object);
+typedef int (*thingset_group_callback_t)(enum thingset_callback_reason cb_reason,
+                                         struct thingset_data_object const* object);
 
 /** Function to be called before/after read/write operations to records. */
-typedef void (*thingset_records_callback_t)(enum thingset_callback_reason cb_reason, int index);
+typedef int (*thingset_records_callback_t)(enum thingset_callback_reason cb_reason, int index,
+                                           struct thingset_data_object const* obj);
 
 /** @cond INTERNAL_HIDDEN */
 
@@ -1753,6 +1754,17 @@ int thingset_export_subsets_progressively(struct thingset_context* ts, uint8_t* 
                                           size_t buf_size, uint16_t subsets,
                                           enum thingset_data_format format, unsigned int* index,
                                           size_t* len);
+
+/**
+ * Aborts the export of data to the buffer passed to @ref
+ * thingset_export_subsets_progressively. Call this method if
+ * the export has failed outside ThingSet code.
+ *
+ * @param ts Pointer to ThingSet context.
+ *
+ * @returns 0 for success
+ */
+int thingset_export_subsets_progressively_abort(struct thingset_context* ts);
 
 /**
  * Export id, value and/or name of a single data item.

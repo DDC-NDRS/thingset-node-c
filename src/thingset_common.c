@@ -130,7 +130,7 @@ int thingset_common_serialize_record(struct thingset_context* ts,
     }
 
     if (records->callback != NULL) {
-        records->callback(THINGSET_CALLBACK_PRE_READ, record_index);
+        records->callback(THINGSET_CALLBACK_PRE_READ, record_index, object);
     }
 
     const struct thingset_data_object* item = thingset_get_object_by_id(ts, object->id) + 1;
@@ -153,7 +153,7 @@ int thingset_common_serialize_record(struct thingset_context* ts,
     }
 
     if (records->callback != NULL) {
-        records->callback(THINGSET_CALLBACK_POST_READ, record_index);
+        records->callback(THINGSET_CALLBACK_POST_READ, record_index, object);
     }
 
     return (ts->api->serialize_map_end(ts));
@@ -186,13 +186,14 @@ int thingset_common_get(struct thingset_context* ts) {
 
         default :
             parent = thingset_get_object_by_id(ts, ts->endpoint.object->parent_id);
-            if ((parent != NULL) && (parent->data.group_callback != NULL)) {
+
+            if (parent != NULL && parent->data.group_callback != NULL) {
                 parent->data.group_callback(THINGSET_CALLBACK_PRE_READ, ts->endpoint.object);
             }
 
             err = ts->api->serialize_value(ts, ts->endpoint.object);
 
-            if ((parent != NULL) && (parent->data.group_callback != NULL)) {
+            if (parent != NULL && parent->data.group_callback != NULL) {
                 parent->data.group_callback(THINGSET_CALLBACK_POST_READ, ts->endpoint.object);
             }
             break;
@@ -233,14 +234,15 @@ int thingset_common_fetch(struct thingset_context* ts) {
         }
 
         /* fetch values */
-        if (ts->endpoint.object->data.group_callback != NULL) {
-            ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_PRE_READ,
-                                                     ts->endpoint.object);
-        }
 
         struct thingset_data_object const* object;
         while ((err = ts->api->deserialize_child(ts, &object))
                 != -THINGSET_ERR_DESERIALIZATION_FINISHED) {
+
+            if (ts->endpoint.object->data.group_callback != NULL) {
+                ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_PRE_READ, object);
+            }
+
             if (err != 0) {
                 return (ts->api->serialize_response(ts, (uint8_t)-err, NULL));
             }
@@ -282,8 +284,7 @@ int thingset_common_fetch(struct thingset_context* ts) {
         }
 
         if (ts->endpoint.object->data.group_callback != NULL) {
-            ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_POST_READ,
-                                                     ts->endpoint.object);
+            ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_POST_READ, object);
         }
     }
     else {
@@ -346,8 +347,10 @@ int thingset_common_update(struct thingset_context* ts) {
     ts->api->deserialize_map_start(ts);
 
     if (ts->endpoint.object->data.group_callback != NULL) {
-        ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_PRE_WRITE,
-                                                 object);
+        int err = ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_PRE_WRITE, object);
+        if (err < 0) {
+            return ts->api->serialize_response(ts, -err, NULL);
+        }
     }
 
     /* actually write data */
@@ -364,8 +367,10 @@ int thingset_common_update(struct thingset_context* ts) {
     }
 
     if (ts->endpoint.object->data.group_callback != NULL) {
-        ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_POST_WRITE,
-                                                 object);
+        int err = ts->endpoint.object->data.group_callback(THINGSET_CALLBACK_POST_WRITE, object);
+        if (err < 0) {
+            return ts->api->serialize_response(ts, -err, NULL);
+        }
     }
 
     /*
